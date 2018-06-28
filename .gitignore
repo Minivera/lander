@@ -1,0 +1,18 @@
+# Misc
+.sass-cache
+.eslintcache
+.cache
+npm-debug.log*
+
+# Compiled output
+dist
+build
+
+# Node modules
+node_modules
+
+# Rollup config
+!rollup.config.js
+
+# Coverage output
+coverage
