@@ -1,9 +1,9 @@
 /** Used to generate unique IDs. */
-const idCounter = 0;
+let idCounter = 0;
 
 const uniqueId = (prefix = '$', sufix = '$') => {
     const id = ++idCounter;
-    return `${prefix}${id.ToString(36)}${sufix}`
-}
+    return `${prefix}${id.toString(36)}${sufix}`;
+};
 
-export default uniqueId
+export default uniqueId;

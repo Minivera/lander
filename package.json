@@ -7,7 +7,7 @@
   "browser": "dist/lander.browser.js",
   "scripts": {
     "build": "rollup -c && uglifyjs ./dist/lander.browser.js -c unsafe=true,unsafe_comps=true,unsafe_math=true,passes=3 -m --source-map -o ./dist/lander.browser.min.js",
-    "start": "parcel src/index.html -p $PORT --out-dir build",
+    "start": "parcel src/index.html -p 8080 --out-dir build --public-url / --no-source-maps --no-cache",
     "test": "npm run test:jest && npm run test:bundlesize",
     "clean": "git clean -fdX .",
     "lint": "eslint ./src",

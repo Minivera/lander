@@ -1,8 +1,14 @@
 {
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
   "extends": "airbnb-base",
   "rules": {
-    "brace-style": ['off'],
-    "indent": ['error', 4, {
+    "brace-style": ["off"],
+    "no-param-reassign": ["error", { "props": false }],
+    "indent": ["error", 4, {
       "SwitchCase": 1,
       "VariableDeclarator": 1,
       "outerIIFEBody": 1,
@@ -23,13 +29,15 @@
       "flatTernaryExpressions": false,
       "ignoreComments": true
     }],
-    "max-len": ['error', 120, 2, {
+    "max-len": ["error", 120, 2, {
       "ignoreUrls": true,
       "ignoreComments": false,
       "ignoreRegExpLiterals": true,
       "ignoreStrings": true,
       "ignoreTemplateLiterals": true
     }],
-    "import/prefer-default-export": 0
+    "import/prefer-default-export": 0,
+    "spaced-comment": 0,
+    "no-plusplus" : 0
   }
 } 
