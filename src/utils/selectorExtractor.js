@@ -1,12 +1,3 @@
-const getSymbolsPos = (tag, currentPos = 0) => {
-    const pos = tag.indexOf('#', currentPos);
-    if (pos >= 0)
-    {
-        return pos;
-    }
-    return tag.indexOf('.', currentPos);
-};
-
 export default (tag) => {
     if (typeof tag !== 'string')
     {
@@ -15,17 +6,17 @@ export default (tag) => {
     //Always crate a div by default
     let tagname = 'div';
     const classes = [];
-    let id = null;
+    let domId = null;
     tag.split('.').forEach((string, index) => {
         if (string.indexOf('#') >= 0)
         {
             const split = string.split('#');
             if (index === 0)
             {
-                [tagname, id] = split;
+                [tagname, domId] = split;
                 return;
             }
-            id = split[1]; /*eslint prefer-destructuring: 0*/
+            domId = split[1]; /*eslint prefer-destructuring: 0*/
             classes.push(split[0]);
             return;
         }
@@ -39,6 +30,6 @@ export default (tag) => {
     return {
         tagname,
         classes,
-        id,
+        domId,
     };
 };

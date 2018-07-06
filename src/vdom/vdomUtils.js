@@ -1,6 +1,7 @@
-import domDiffer from './domDiffer';
-
-const getChildIndex = (children = [], id) => children.findIndex(vnode => vnode === id);
+import keySort from '../utils/keySorter';
+import getChildIndex from '../utils/getVChildIndex';
+import domDiffer from './vdomDiffer';
+import patchRegistry from '../operations/patchRegistry';
 
 export default {
     internalTree: null,
@@ -18,8 +19,8 @@ export default {
         this.positionInternal(this.internalTree, null);
     },
 
-    createInternal(factory, mock = false) {
-        const { node, creationData } = factory();
+    createInternal(nodeCreator, mock = false) {
+        const { node, creationData } = nodeCreator;
         node.create(creationData, mock);
         node.children = node.children.map(child => this.createInternal(child));
         return node;
@@ -27,7 +28,7 @@ export default {
 
     positionInternal(node, parent) {
         node.position(parent);
-        node.children.forEach(child => this.positionInternal(child, node));
+        node.children.sort(keySort).forEach(child => this.positionInternal(child, node));
     },
 
     mount(root, vnode) {
@@ -64,9 +65,14 @@ export default {
         if (!this.mounted)
         {
             //TODO: Improve error message
-            throw new Error('The virtual dom tree must be mounted for the diffing to work.');
+            throw new Error('The virtual vdom tree must be mounted for the diffing to work.');
         }
-        return domDiffer.diff(this.internalTree.domNode, this.internalTree, this.createInternal(this.factory(), true));
+        domDiffer.diff(
+            this.internalTree,
+            this.createInternal(this.factory(), true),
+            [],
+        );
+        patchRegistry.execute(this.internalTree);
     },
 
     remove(vnode) {

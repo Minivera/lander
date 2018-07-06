@@ -1,5 +1,5 @@
 import { TEXT_TAG_TYPE } from '../utils/constants';
-import treeUtils from '../dom';
+import treeUtils from '../vdom/vdomUtils';
 
 import baseNode from './baseElement';
 

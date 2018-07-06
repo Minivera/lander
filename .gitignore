@@ -3,6 +3,7 @@
 .eslintcache
 .cache
 npm-debug.log*
+.idea
 
 # Compiled output
 dist

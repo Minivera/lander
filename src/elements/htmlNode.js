@@ -1,5 +1,5 @@
 import { HTML_TAG_TYPE } from '../utils/constants';
-import treeUtils from '../dom';
+import treeUtils from '../vdom/vdomUtils';
 
 import baseNode from './baseElement';
 
@@ -18,12 +18,12 @@ export default () => Object.assign({}, baseNode, {
             nodeId,
             tagname,
             classes,
-            id,
+            domId,
         } = data;
 
         this.tagname = tagname;
         this.classes = classes;
-        this.domId = id;
+        this.domId = domId;
         baseNode.create.call(this, {
             attributes,
             children,
@@ -47,11 +47,11 @@ export default () => Object.assign({}, baseNode, {
             attributes,
             children,
             classes,
-            id,
+            domId,
         } = data;
 
         this.classes = classes;
-        this.domId = id;
+        this.domId = domId;
         this.setDomAttrs();
         baseNode.update.call(this, {
             attributes,

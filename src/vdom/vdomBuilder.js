@@ -1,10 +1,10 @@
 import selectorExtractor from '../utils/selectorExtractor';
-import { VNodeFactory } from '../elements';
+import factory from '../elements/factory';
 
 const vnodizeChildren = (child) => {
-    if (typeof child !== 'function' || !child.isFactory)
+    if (typeof child !== 'object')
     {
-        return VNodeFactory(child);
+        return factory(child);
     }
     return child;
 };
@@ -13,8 +13,8 @@ export default (tag, attributes = {}, children = [], listeners = {}) => {
     const childArray = children.constructor !== Array ? [children] : children;
     if (typeof tag === 'function')
     {
-        return VNodeFactory(tag, attributes, childArray.map(vnodizeChildren), listeners);
+        return factory(tag, attributes, childArray.map(vnodizeChildren), listeners);
     }
     const selector = selectorExtractor(tag);
-    return VNodeFactory(selector, attributes, childArray.map(vnodizeChildren), listeners);
+    return factory(selector, attributes, childArray.map(vnodizeChildren), listeners);
 };

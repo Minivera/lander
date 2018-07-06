@@ -1,6 +1,6 @@
 import { UNKNOWN_TAG_TYPE } from '../utils/constants';
 import uniqueId from '../utils/uid';
-import treeUtils from '../dom';
+import treeUtils from '../vdom/vdomUtils';
 
 export default {
     id: null,
@@ -79,7 +79,6 @@ export default {
     },
 
     setAttribute(attrName, attrValue) {
-        this.dirty = true;
         this.attributes[attrName] = attrValue;
     },
 
