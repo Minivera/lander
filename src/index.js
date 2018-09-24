@@ -1,13 +1,15 @@
-import l from './vdom/vdomBuilder';
-import utils from './vdom/vdomUtils';
+import tree from './node/vtree';
+import node from './node/vnode';
 
-let state = 0;
+/*let state = 0;
 const setState = (event, vnode) => {
     state++;
     vnode.requestUpdate();
-};
+};*/
 
-utils.mount(document.querySelector('#root'), () => l('div#test.test', {
+tree.mount(node('div#test.test'), document.querySelector('#root'));
+
+/*utils.mount(document.querySelector('#root'), () => l('div#test.test', {
     style: 'color: red;',
 }, [
     'Hello World',
@@ -15,4 +17,4 @@ utils.mount(document.querySelector('#root'), () => l('div#test.test', {
         click: setState,
     }, `${state} click`),
     state % 2 === 0 ? l('span.even', {}, 'Even') : l('span.even', {}, 'Odd'),
-]));
+]));*/

@@ -1,14 +1,8 @@
-const HTML_TAG_TYPE = 'html';
+export const lifecycleCreate = 'create';
+export const lifecycleMount = 'mount';
+export const lifecyclePosition = 'position';
+export const lifecycleUpdate = 'update';
+export const lifecycleUnmount = 'unmount';
+export const lifecycleRemove = 'remove';
 
-const FUNC_TAG_TYPE = 'func';
-
-const TEXT_TAG_TYPE = 'text';
-
-const UNKNOWN_TAG_TYPE = 'unknown';
-
-export {
-    HTML_TAG_TYPE,
-    FUNC_TAG_TYPE,
-    TEXT_TAG_TYPE,
-    UNKNOWN_TAG_TYPE,
-};
+export const lifecycleEvents = ['create', 'mount', 'position', 'update', 'unmount', 'remove'];
