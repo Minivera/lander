@@ -11,36 +11,36 @@ export const childList = {
     prepend(child) {
         this.children = [child].concat(this.children);
         if (this.children.length > 1) {
-            this.domNode.childNodes.insertBefore(this.children[1].domNode, child.domNode);
+            this.domNode.insertBefore(this.children[1].domNode, child.domNode);
         }
         else {
-            this.domNode.childNodes.appendChild(child.domNode);
+            this.domNode.appendChild(child.domNode);
         }
         return this;
     },
 
     append(child) {
         this.children = this.children.concat(child);
-        this.domNode.childNodes.appendChild(child.domNode);
+        this.domNode.appendChild(child.domNode);
         return this;
     },
 
     insertBefore(child, childBefore) {
         //TODO
-        this.domNode.childNodes.insertBefore(childBefore.domNode, child.domNode);
+        this.domNode.insertBefore(childBefore.domNode, child.domNode);
         return this;
     },
 
     insertAfter(child, childAfter) {
         //TODO
-        this.domNode.childNodes.insertBefore(childAfter.domNode.nextSibling, child.domNode);
+        this.domNode.insertBefore(childAfter.domNode.nextSibling, child.domNode);
         return this;
     },
 
     remove(child) {
         this.children = this.children.filter((element) => {
             if (element === child) {
-                this.domNode.childNodes.removeChild(element.domNode);
+                this.domNode.removeChild(element.domNode);
                 return false;
             }
             return true;
@@ -51,7 +51,7 @@ export const childList = {
     replace(child, childToReplace) {
         this.children = this.children.map((element) => {
             if (element === child) {
-                this.domNode.childNodes.replaceChild(childToReplace.domNode, element.domNode);
+                this.domNode.replaceChild(childToReplace.domNode, element.domNode);
                 return childToReplace;
             }
             return element;
@@ -60,7 +60,7 @@ export const childList = {
     },
 
     clear() {
-        this.domNode.childNodes.forEach(child => this.domNode.removeChild(child));
+        Array.from(this.domNode.childNodes).forEach(child => this.domNode.removeChild(child));
         this.children = [];
         return this;
     },
@@ -100,7 +100,7 @@ export const childList = {
     },
 
     apply() {
-        this.domNode.childNodes.forEach(child => this.domNode.removeChild(child));
+        Array.from(this.domNode.childNodes).forEach(child => this.domNode.removeChild(child));
         this.children.forEach((child) => {
             this.domNode.appendChild(child.domNode);
         });

@@ -50,7 +50,7 @@ export const attrMap = {
     },
 
     apply() {
-        this.domNode.attributes.forEach((_, name) => this.domNode.removeAttribute(name));
+        Array.from(this.domNode.attributes).forEach((_, name) => this.domNode.removeAttribute(name));
         Object.keys(this.attrs).forEach((name) => {
             this.domNode.setAttribute(name, this.attrs[name]);
         });

@@ -1,13 +1,33 @@
 import tree from './node/vtree';
 import node from './node/vnode';
+import text from './node/vtext';
 
-/*let state = 0;
-const setState = (event, vnode) => {
+let state = 0;
+function setState() {
     state++;
-    vnode.requestUpdate();
-};*/
+    this.nextSibling.update();
+}
 
-tree.mount(node('div#test.test'), document.querySelector('#root'));
+tree.mount(
+    node('div#test.test')
+        .style('color: red;')
+        .setClass('toto tata')
+        .appendChild(
+            text('Hello world'),
+        )
+        .appendChild(
+            node('button')
+                .onclick(setState)
+                .appendChild(
+                    text('Click to increase value'),
+                ),
+        )
+        .appendChild(
+            node('input')
+                .value(() => state),
+        ),
+    document.querySelector('#root'),
+);
 
 /*utils.mount(document.querySelector('#root'), () => l('div#test.test', {
     style: 'color: red;',

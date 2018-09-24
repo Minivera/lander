@@ -6,3 +6,6 @@ export const lifecycleUnmount = 'unmount';
 export const lifecycleRemove = 'remove';
 
 export const lifecycleEvents = ['create', 'mount', 'position', 'update', 'unmount', 'remove'];
+
+export const htmlNodeType = 'HTML';
+export const textNodeType = 'TEXT';

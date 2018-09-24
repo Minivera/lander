@@ -6,6 +6,8 @@ import {
     lifecycleUnmount,
     lifecycleRemove,
     lifecycleEvents,
+    htmlNodeType,
+    textNodeType,
 } from '../utils/constants';
 import selectorExtractor from '../utils/selectorExtractor';
 import AttrMap from '../containers/attrMap';
@@ -16,7 +18,9 @@ import uniqueId from '../utils/uid';
 
 export const vnode = {
     id: null,
+    type: htmlNodeType,
     tagname: null,
+    text: null,
     domId: null,
     domNode: null,
     attributes: {},
@@ -38,14 +42,20 @@ export const vnode = {
     },
 
     mount() {
-        this.domNode = document.createElement(this.tagname);
-        this.attributes = new AttrMap(this.domNode, {
-            id: this.domId,
-            ...this.attributes,
-        });
-        this.children = new ChildList(this.domNode, this.children);
-        this.eventListeners = new ListenerMap(this.domNode, this.eventListeners);
-        this.classes = new ClassList(this.domNode, this.classes);
+        if (this.tagname !== null) {
+            this.domNode = document.createElement(this.tagname);
+            this.attributes = new AttrMap(this.domNode, {
+                id: this.domId,
+                ...this.attributes,
+            });
+            this.children = new ChildList(this.domNode, this.children);
+            this.eventListeners = new ListenerMap(this.domNode, this.eventListeners);
+            this.classes = new ClassList(this.domNode, this.classes);
+        }
+        else {
+            this.domNode = document.createTextNode(this.text);
+            this.type = textNodeType;
+        }
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleMount]) {
             this.hooks[lifecycleMount].forEach(call => call(this));
@@ -163,13 +173,64 @@ export const vnode = {
         childToReplace.unmount().remove();
         return this;
     },
+
+    addHook(hook, listener) {
+        if (!this.hooks[hook]) {
+            this.hooks[hook] = [];
+        }
+        this.hooks[hook] = this.hooks[hook].concat(listener);
+        return this;
+    },
+
+    removeHook(hook, listener) {
+        if (!this.hooks[hook]) {
+            return this;
+        }
+        this.hooks[hook] = this.hooks[hook].filter(el => el !== listener);
+        return this;
+    },
+
+    addEventListener(event, listener) {
+        this.eventListeners.addListener(event, listener.bind(this));
+        return this;
+    },
+
+    removeEventListener(event, listener) {
+        this.eventListeners.removeListener(event, listener);
+        return this;
+    },
+
+    setClass(classString) {
+        this.classes.setClasses(classString.split(' '));
+        return this;
+    },
+};
+
+export const proxyHandlers = {
+    get(obj, prop, receiver) {
+        if (prop in obj) {
+            return obj[prop];
+        }
+        return (value) => {
+            if (prop.startsWith('on')) {
+                if (lifecycleEvents.includes(prop.substring(0, 2))) {
+                    obj.addHook(prop.substring(2), value);
+                    return obj;
+                }
+                obj.addEventListener(prop.substring(2), value);
+                return receiver;
+            }
+            obj.attributes.setAttribute(prop, value, obj);
+            return receiver;
+        };
+    },
 };
 
 export default (tag) => {
     const selector = selectorExtractor(tag);
 
-    return {
+    return new Proxy({
         ...vnode,
         ...selector,
-    }.create().mount();
+    }.create().mount(), proxyHandlers);
 };
