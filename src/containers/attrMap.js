@@ -1,7 +1,7 @@
-export const attrMap = {
+export default (domNode = null, defaults = {}) => Object.assign({}, {
     attrs: {},
     factories: {},
-    domNode: null,
+    domNode,
 
     setAttributes(attributes, passThru = {}) {
         Object.keys(attributes).forEach(name => this.addAttribute(name, attributes[name], passThru));
@@ -50,15 +50,10 @@ export const attrMap = {
     },
 
     apply() {
-        Array.from(this.domNode.attributes).forEach((_, name) => this.domNode.removeAttribute(name));
+        Array.from(this.domNode.attributes).forEach(attr => this.domNode.removeAttribute(attr.name));
         Object.keys(this.attrs).forEach((name) => {
             this.domNode.setAttribute(name, this.attrs[name]);
         });
         return this;
     },
-};
-
-export default (domNode, defaults = {}) => ({
-    ...attrMap,
-    domNode,
-}.setAttributes(defaults));
+}).setAttributes(defaults);

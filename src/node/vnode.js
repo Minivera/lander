@@ -7,7 +7,6 @@ import {
     lifecycleRemove,
     lifecycleEvents,
     htmlNodeType,
-    textNodeType,
 } from '../utils/constants';
 import selectorExtractor from '../utils/selectorExtractor';
 import AttrMap from '../containers/attrMap';
@@ -20,7 +19,6 @@ export const vnode = {
     id: null,
     type: htmlNodeType,
     tagname: null,
-    text: null,
     domId: null,
     domNode: null,
     attributes: {},
@@ -42,20 +40,14 @@ export const vnode = {
     },
 
     mount() {
-        if (this.tagname !== null) {
-            this.domNode = document.createElement(this.tagname);
-            this.attributes = new AttrMap(this.domNode, {
-                id: this.domId,
-                ...this.attributes,
-            });
-            this.children = new ChildList(this.domNode, this.children);
-            this.eventListeners = new ListenerMap(this.domNode, this.eventListeners);
-            this.classes = new ClassList(this.domNode, this.classes);
+        this.domNode = document.createElement(this.tagname);
+        this.attributes = new AttrMap(this.domNode, this.attributes);
+        if (this.domId) {
+            this.attributes.addAttribute('id', this.domId);
         }
-        else {
-            this.domNode = document.createTextNode(this.text);
-            this.type = textNodeType;
-        }
+        this.children = new ChildList(this.domNode, this.children);
+        this.eventListeners = new ListenerMap(this.domNode, this.eventListeners);
+        this.classes = new ClassList(this.domNode, this.classes);
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleMount]) {
             this.hooks[lifecycleMount].forEach(call => call(this));
@@ -229,8 +221,8 @@ export const proxyHandlers = {
 export default (tag) => {
     const selector = selectorExtractor(tag);
 
-    return new Proxy({
+    return new Proxy(Object.assign({}, {
         ...vnode,
         ...selector,
-    }.create().mount(), proxyHandlers);
+    }).create().mount(), proxyHandlers);
 };

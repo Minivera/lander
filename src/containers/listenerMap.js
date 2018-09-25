@@ -1,6 +1,6 @@
-export const listenersMap = {
+export default (domNode = null, defaults = {}) => Object.assign({}, {
     listeners: {},
-    domNode: null,
+    domNode,
 
     setListeners(listeners) {
         Object.keys(listeners).forEach(name => this.addListener(name, listeners[name]));
@@ -45,9 +45,4 @@ export const listenersMap = {
         });
         return this;
     },
-};
-
-export default (domNode, defaults = {}) => ({
-    ...listenersMap,
-    domNode,
 }).setListeners(defaults);

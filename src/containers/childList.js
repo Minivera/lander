@@ -1,6 +1,6 @@
-export const childList = {
+export default (domNode = null, defaults = []) => Object.assign({}, {
     children: [],
-    domNode: null,
+    domNode,
 
     setChildren(children) {
         this.children = children;
@@ -9,7 +9,7 @@ export const childList = {
     },
 
     prepend(child) {
-        this.children = [child].concat(this.children);
+        this.children = [child].concat([this.children]);
         if (this.children.length > 1) {
             this.domNode.insertBefore(this.children[1].domNode, child.domNode);
         }
@@ -20,19 +20,27 @@ export const childList = {
     },
 
     append(child) {
-        this.children = this.children.concat(child);
+        this.children = this.children.concat([child]);
         this.domNode.appendChild(child.domNode);
         return this;
     },
 
     insertBefore(child, childBefore) {
-        //TODO
+        const pos = this.childPos(childBefore);
+        if (pos <= 0) {
+            return this.prepend(child);
+        }
+        this.children = this.children.slice(0, pos).concat([child], this.children.slice(pos));
         this.domNode.insertBefore(childBefore.domNode, child.domNode);
         return this;
     },
 
     insertAfter(child, childAfter) {
-        //TODO
+        const pos = this.childPos(childAfter);
+        if (pos >= this.children.length - 1) {
+            return this.append(child);
+        }
+        this.children = this.children.slice(0, pos + 1).concat([child], this.children.slice(pos + 1));
         this.domNode.insertBefore(childAfter.domNode.nextSibling, child.domNode);
         return this;
     },
@@ -87,7 +95,7 @@ export const childList = {
     },
 
     childPos(child) {
-        let index = 0;
+        let index = -1;
         const found = this.children.find((element) => {
             index++;
             return element === child;
@@ -106,9 +114,4 @@ export const childList = {
         });
         return this;
     },
-};
-
-export default (domNode, defaults = []) => ({
-    ...childList,
-    domNode,
 }).setChildren(defaults);

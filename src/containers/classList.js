@@ -1,6 +1,6 @@
-export const classList = {
+export default (domNode = null, defaults = []) => Object.assign({}, {
     classes: [],
-    domNode: null,
+    domNode,
 
     setClasses(classes) {
         this.classes = classes;
@@ -9,7 +9,7 @@ export const classList = {
     },
 
     addClass(classString) {
-        this.classes = this.classes.concat(classString);
+        this.classes = this.classes.concat([classString]);
         this.domNode.classList.add(classString);
         return this;
     },
@@ -30,6 +30,19 @@ export const classList = {
         return this;
     },
 
+    forEach(callback) {
+        this.classes.forEach(callback);
+        return this;
+    },
+
+    map(callback) {
+        return this.classes.map(callback);
+    },
+
+    reduce(callback, initialValue) {
+        return this.classes.reduce(callback, initialValue);
+    },
+
     apply() {
         const { classList: classes } = this.domNode;
         while (classes.length > 0)
@@ -39,9 +52,4 @@ export const classList = {
         this.classes.forEach(c => classes.add(c));
         return this;
     },
-};
-
-export default (domNode, defaults = []) => ({
-    ...classList,
-    domNode,
 }).setClasses(defaults);
