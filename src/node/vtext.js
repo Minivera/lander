@@ -9,11 +9,11 @@ export default text => Object.assign({}, {
 
     create() {
         this.id = uniqueId();
+        this.domNode = document.createTextNode(this.text);
         return this;
     },
 
     mount() {
-        this.domNode = document.createTextNode(this.text);
         return this;
     },
 
@@ -32,4 +32,9 @@ export default text => Object.assign({}, {
     remove() {
         return this;
     },
-}).create().mount();
+
+    setText(newText) {
+        this.text = newText;
+        this.domNode = document.createTextNode(newText);
+    },
+}).create();

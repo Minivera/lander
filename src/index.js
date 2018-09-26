@@ -3,9 +3,16 @@ import node from './node/vnode';
 import text from './node/vtext';
 
 let state = 0;
+const oddMessage = text('Number is odd');
+const evenMessage = text('Number is even');
 function setState() {
     state++;
     this.nextSibling.update();
+    if (state % 2) {
+        this.parent.replaceChild(oddMessage, evenMessage);
+    } else {
+        this.parent.replaceChild(evenMessage, oddMessage);
+    }
 }
 
 tree.mount(
@@ -25,16 +32,7 @@ tree.mount(
         .appendChild(
             node('input')
                 .value(() => state),
-        ),
+        )
+        .appendChild(evenMessage),
     document.querySelector('#root'),
 );
-
-/*utils.mount(document.querySelector('#root'), () => l('div#test.test', {
-    style: 'color: red;',
-}, [
-    'Hello World',
-    l('button', {
-        click: setState,
-    }, `${state} click`),
-    state % 2 === 0 ? l('span.even', {}, 'Even') : l('span.even', {}, 'Odd'),
-]));*/

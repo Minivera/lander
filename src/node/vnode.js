@@ -32,14 +32,6 @@ export const vnode = {
 
     create() {
         this.id = uniqueId();
-        // Once everything is done, execute the lifecycle listener(s)
-        if (this.hooks[lifecycleCreate]) {
-            this.hooks[lifecycleCreate].forEach(call => call(this));
-        }
-        return this;
-    },
-
-    mount() {
         this.domNode = document.createElement(this.tagname);
         this.attributes = new AttrMap(this.domNode, this.attributes);
         if (this.domId) {
@@ -49,8 +41,16 @@ export const vnode = {
         this.eventListeners = new ListenerMap(this.domNode, this.eventListeners);
         this.classes = new ClassList(this.domNode, this.classes);
         // Once everything is done, execute the lifecycle listener(s)
+        if (this.hooks[lifecycleCreate]) {
+            this.hooks[lifecycleCreate].forEach(call => call().bind(this));
+        }
+        return this;
+    },
+
+    mount() {
+        // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleMount]) {
-            this.hooks[lifecycleMount].forEach(call => call(this));
+            this.hooks[lifecycleMount].forEach(call => call().bind(this));
         }
         return this;
     },
@@ -67,51 +67,51 @@ export const vnode = {
         }
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecyclePosition]) {
-            this.hooks[lifecyclePosition].forEach(call => call(this));
+            this.hooks[lifecyclePosition].forEach(call => call().bind(this));
         }
         return this;
     },
 
     update() {
+        const oldAttributes = Object.assign({}, this.attributes.attrs);
         this.attributes.refreshAttributes();
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleUpdate]) {
-            this.hooks[lifecycleUpdate].forEach(call => call(this));
+            this.hooks[lifecycleUpdate].forEach(call => call(oldAttributes).bind(this));
         }
         return this;
     },
 
     unmount() {
         this.children.forEach(child => child.unmount());
-        this.domNode = null;
         this.parent = null;
         this.prevSibling = null;
         this.nextSibling = null;
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleUnmount]) {
-            this.hooks[lifecycleUnmount].forEach(call => call(this));
+            this.hooks[lifecycleUnmount].forEach(call => call().bind(this));
         }
         return this;
     },
 
     remove() {
-        this.children.clear();
+        this.children.forEach(child => child.remove());
         // Once everything is done, execute the lifecycle listener(s)
         if (this.hooks[lifecycleRemove]) {
-            this.hooks[lifecycleRemove].forEach(call => call(this));
+            this.hooks[lifecycleRemove].forEach(call => call().bind(this));
         }
         return this;
     },
 
     prependChild(child) {
-        this.children.prepend(child);
+        this.children.prepend(child.mount());
         //Position the vnode with its siblings and parents
         child.position(this, null, this.children.getChild(1));
         return this;
     },
 
     appendChild(child) {
-        this.children.append(child);
+        this.children.append(child.mount());
         //Position the vnode with its siblings and parents
         child.position(this, this.children.getChild(this.children.childPos(child) - 1), null);
         return this;
@@ -121,7 +121,7 @@ export const vnode = {
         if (!this.children.hasChild(childBefore)) {
             return this;
         }
-        this.children.insertBefore(child, childBefore);
+        this.children.insertBefore(child.mount(), childBefore);
         //Position the vnode with its siblings and parents
         child.position(this, this.children.getChild(this.children.childPos(child) - 1), childBefore);
         return this;
@@ -131,7 +131,7 @@ export const vnode = {
         if (!this.children.hasChild(childAfter)) {
             return this;
         }
-        this.children.insertAfter(child, childAfter);
+        this.children.insertAfter(child.mount(), childAfter);
         //Position the vnode with its siblings and parents
         child.position(this, childAfter, this.children.getChild(this.children.childPos(child) + 1));
         return this;
@@ -151,8 +151,8 @@ export const vnode = {
         else if (child.nextSibling) {
             child.nextSibling.prevSibling = null;
         }
-        this.children.remove(child);
-        child.unmount().remove();
+        this.children.remove(child.unmount());
+        child.remove();
         return this;
     },
 
@@ -160,9 +160,9 @@ export const vnode = {
         if (!this.children.hasChild(childToReplace)) {
             return this;
         }
-        this.children.replace(child, childToReplace);
+        this.children.replace(child.mount(), childToReplace.unmount());
         child.position(this, childToReplace.prevSibling, childToReplace.nextSibling);
-        childToReplace.unmount().remove();
+        childToReplace.remove();
         return this;
     },
 
@@ -224,5 +224,5 @@ export default (tag) => {
     return new Proxy(Object.assign({}, {
         ...vnode,
         ...selector,
-    }).create().mount(), proxyHandlers);
+    }).create(), proxyHandlers);
 };

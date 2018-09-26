@@ -25,23 +25,23 @@ export default (domNode = null, defaults = []) => Object.assign({}, {
         return this;
     },
 
-    insertBefore(child, childBefore) {
+    insertBefore(newChild, childBefore) {
         const pos = this.childPos(childBefore);
         if (pos <= 0) {
-            return this.prepend(child);
+            return this.prepend(newChild);
         }
-        this.children = this.children.slice(0, pos).concat([child], this.children.slice(pos));
-        this.domNode.insertBefore(childBefore.domNode, child.domNode);
+        this.children = this.children.slice(0, pos).concat([newChild], this.children.slice(pos));
+        this.domNode.insertBefore(childBefore.domNode, newChild.domNode);
         return this;
     },
 
-    insertAfter(child, childAfter) {
+    insertAfter(newChild, childAfter) {
         const pos = this.childPos(childAfter);
         if (pos >= this.children.length - 1) {
-            return this.append(child);
+            return this.append(newChild);
         }
-        this.children = this.children.slice(0, pos + 1).concat([child], this.children.slice(pos + 1));
-        this.domNode.insertBefore(childAfter.domNode.nextSibling, child.domNode);
+        this.children = this.children.slice(0, pos + 1).concat([newChild], this.children.slice(pos + 1));
+        this.domNode.insertBefore(childAfter.domNode.nextSibling, newChild.domNode);
         return this;
     },
 
@@ -56,11 +56,11 @@ export default (domNode = null, defaults = []) => Object.assign({}, {
         return this;
     },
 
-    replace(child, childToReplace) {
+    replace(newChild, childToReplace) {
         this.children = this.children.map((element) => {
-            if (element === child) {
-                this.domNode.replaceChild(childToReplace.domNode, element.domNode);
-                return childToReplace;
+            if (element === childToReplace) {
+                this.domNode.replaceChild(newChild.domNode, element.domNode);
+                return newChild;
             }
             return element;
         });
