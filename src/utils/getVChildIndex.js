@@ -1,1 +1,1 @@
-export default (children = [], id) => children.findIndex(vnode => vnode.id === id);
+export default (children = [], node) => children.findIndex(vnode => JSON.stringify(vnode) === JSON.stringify(node));

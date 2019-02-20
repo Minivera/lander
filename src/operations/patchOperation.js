@@ -1,4 +1,4 @@
-export function patchOperationFactory(type, node, meta) {
+export default function(type, node, meta) {
     return {
         type,
         node,
