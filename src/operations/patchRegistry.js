@@ -1,7 +1,7 @@
 import getChildIndex from '../utils/getVChildIndex';
 import HtmlNode from '../nodes/htmlNode';
 import TextNode from '../nodes/textNode';
-import builder from '../vdom/builder';
+import nodeMaker from '../vdom/nodeMaker';
 
 import {
     PATCH_TEXT,
@@ -71,7 +71,7 @@ export default {
 
         node.update(op.node);
         const nodeIndex = getChildIndex(parent.children, node);
-        domNode.domNode.replaceChild(builder.createTextNode(node.text), domNode.domNode.childNodes[nodeIndex]);
+        domNode.domNode.replaceChild(nodeMaker.createTextNode(node.text), domNode.domNode.childNodes[nodeIndex]);
     },
 
     patchNode(parent, node, domNode, op) {
@@ -86,11 +86,11 @@ export default {
         op.node.create();
         parent.children.push(op.node);
         if (node instanceof HtmlNode) {
-            const newDomNode = builder.createElement(op.node.tagname);
+            const newDomNode = nodeMaker.createElement(op.node.tagname);
             op.node.mount(newDomNode);
             domNode.domNode.appendChild(op.node.domNode);
         } else if (node instanceof TextNode) {
-            const newDomNode = builder.createTextNode(op.node.text);
+            const newDomNode = nodeMaker.createTextNode(op.node.text);
             domNode.domNode.appendChild(newDomNode);
         }
     },

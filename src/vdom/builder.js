@@ -2,14 +2,9 @@ import HtmlNode from '../nodes/htmlNode';
 import TextNode from '../nodes/textNode';
 
 import differ from './differ';
+import nodeMaker from './nodeMaker';
 
 export default {
-    $window: window,
-
-    init($window) {
-        this.$window = $window;
-    },
-
     build(vtreeFactory, root) {
         return this.buildRecursive(vtreeFactory, root);
     },
@@ -19,9 +14,9 @@ export default {
         let domNode = null;
 
         if (node instanceof HtmlNode) {
-            domNode = this.createElement(node.tagname);
+            domNode = nodeMaker.createElement(node.tagname);
         } else if (node instanceof TextNode) {
-            domNode = this.createTextNode(node.text);
+            domNode = nodeMaker.createTextNode(node.text);
         }
 
         // Make sure we keep the dom nodes alive
@@ -64,13 +59,5 @@ export default {
         }
 
         return node;
-    },
-
-    createElement(tagname) {
-        return this.$window.document.createElement(tagname);
-    },
-
-    createTextNode(text) {
-        return this.$window.document.createTextNode(text);
     },
 };
