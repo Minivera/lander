@@ -1,6 +1,6 @@
 import getChildIndex from '../utils/getVChildIndex';
-import HtmlNode from '../nodes/htmlNode';
-import TextNode from '../nodes/textNode';
+import { HtmlNode } from '../nodes/htmlNode';
+import { TextNode } from '../nodes/textNode';
 import nodeMaker from '../vdom/nodeMaker';
 
 import {
@@ -8,6 +8,7 @@ import {
     PATCH_NODE,
     PATCH_INSERT,
     PATCH_REMOVE,
+    PATCH_REPLACE,
     PATCH_REORDER,
 } from './patchOpTypes';
 
@@ -28,7 +29,8 @@ export default {
     executeRecursive(parent, node, lastDomNode, currentPath) {
         this
             .operations
-            .filter(op => JSON.stringify(op.oldNode) === JSON.stringify(node))
+            .filter(op => JSON.stringify(op.oldNode) === JSON.stringify(node)
+                || JSON.stringify(op.parent) === JSON.stringify(node))
             .forEach((operation) => {
                 switch (operation.type) {
                     case PATCH_TEXT:
@@ -42,6 +44,9 @@ export default {
                         break;
                     case PATCH_REMOVE:
                         this.patchRemove(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_REPLACE:
+                        this.patchReplace(parent, node, lastDomNode, operation);
                         break;
                     case PATCH_REORDER:
                         this.patchReorder(parent, node, lastDomNode, operation);
@@ -84,12 +89,12 @@ export default {
         }
 
         op.node.create();
-        parent.children.push(op.node);
-        if (node instanceof HtmlNode) {
+        node.children.push(op.node);
+        if (op.node instanceof HtmlNode) {
             const newDomNode = nodeMaker.createElement(op.node.tagname);
             op.node.mount(newDomNode);
             domNode.domNode.appendChild(op.node.domNode);
-        } else if (node instanceof TextNode) {
+        } else if (op.node instanceof TextNode) {
             const newDomNode = nodeMaker.createTextNode(op.node.text);
             domNode.domNode.appendChild(newDomNode);
         }
@@ -100,25 +105,30 @@ export default {
             return;
         }
 
+        const nodeIndex = getChildIndex(node.children, op.node);
         if (node instanceof HtmlNode) {
             domNode.domNode.removeChild(op.node.domNode);
         } else if (node instanceof TextNode) {
-            const nodeIndex = getChildIndex(node.parent.children, node);
             domNode.domNode.removeChild(domNode.childNodes[nodeIndex]);
         }
-        node.remove();
+        node.children = node.children.slice(0, nodeIndex).concat(parent.children.slice(-nodeIndex));
+        op.node.remove();
     },
 
-    patchReorder(parent, node, domNode) {
+    patchReplace(parent, node, domNode, op) {
         if (!domNode) {
             return;
         }
 
-        domNode.domNode.childNodes.forEach(child => domNode.domNode.removeChild(child));
-        parent.children.forEach((child) => {
-            if (child instanceof HtmlNode) {
-                domNode.domNode.appendChild(child.domNode);
-            }
-        });
+        if (node instanceof HtmlNode) {
+            const newDomNode = nodeMaker.createElement(op.node.tagname);
+            domNode.domNode.replaceChild(newDomNode, node.domNode);
+        } else if (node instanceof TextNode) {
+            const nodeIndex = getChildIndex(node.parent.children, node);
+            const newDomNode = nodeMaker.createTextNode(op.node.text);
+            domNode.domNode.replaceChild(newDomNode, domNode.childNodes[nodeIndex]);
+        }
     },
+
+    patchReorder(parent, node, domNode, op) {},
 };

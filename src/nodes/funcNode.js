@@ -1,9 +1,10 @@
 import hooksStore from '../hooks/hooksStore';
 import { FUNC_TAG_TYPE } from '../utils/constants';
 
-export default function() {
-    this.factory = () => {};
-    this.attributes = {};
+export function FuncNode(id = '', factory = () => {}, attributes = {}) {
+    this.nodeId = id;
+    this.factory = factory;
+    this.attributes = attributes;
     this.children = [];
     this.type = FUNC_TAG_TYPE;
 
@@ -15,24 +16,24 @@ export default function() {
         const prevElement = hooksStore.currentElement;
         hooksStore.currentElement = this;
 
-        const result = this.factory(this.attributes);
-        this.children = result;
+        let result = this.factory(this.attributes);
         if (!Array.isArray(result)) {
-            this.children = [result];
+            result = [result];
         }
 
         hooksStore.currentElement = prevElement;
+        return result;
     };
 
-    this.update = (data = {}) => {
-        const {
-            attributes,
-        } = data;
-
-        this.attributes = attributes;
+    this.update = ({ attributes: newAttributes }) => {
+        this.attributes = newAttributes;
     };
 
     this.remove = () => {};
 
     this.toString = () => this.children.map(child => child.toString());
+
+    this.clone = () => new FuncNode(this.nodeId, this.factory, this.attributes);
 }
+
+export default FuncNode;

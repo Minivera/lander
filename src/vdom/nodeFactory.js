@@ -1,7 +1,7 @@
 import factory from '../nodes/factory';
 
 const vnodizeChildren = (child) => {
-    if (typeof child !== 'function') {
+    if (typeof child !== 'object') {
         return factory(child, null, null, true);
     }
     return child;

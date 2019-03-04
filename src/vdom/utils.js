@@ -3,15 +3,18 @@ import patchRegistry from '../operations/patchRegistry';
 
 export default {
     vtree: null,
-    factory: () => {},
 
     mount(root, tree) {
-        this.factory = tree;
-        this.vtree = builder.build(tree, root);
+        this.vtree = builder.build(tree);
+        this.vtree = builder.mount(tree, root);
+    },
+
+    render(tree) {
+        return builder.render(tree);
     },
 
     update() {
-        builder.diff(this.factory, this.vtree);
+        builder.diff(this.vtree);
         patchRegistry.execute(this.vtree);
     },
 };

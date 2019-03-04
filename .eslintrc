@@ -40,6 +40,6 @@
     "spaced-comment": 0,
     "no-plusplus" : 0,
     "array-bracket-spacing": "off",
-    "space-before-function-paren": "off",
+    "space-before-function-paren": "off"
   }
 } 
