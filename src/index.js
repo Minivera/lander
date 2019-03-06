@@ -23,7 +23,7 @@ utils.mount(document.querySelector('#root'), l(() => {
         l('button', {
             click: setState,
         }, `${count} click`),
-        count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.even', {}, 'Odd'),
+        count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
         l('div.test2', {}, [
             l(() => {
                 const [ getVal, setVal ] = hookBinding('');

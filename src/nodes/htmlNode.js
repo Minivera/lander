@@ -41,6 +41,7 @@ export function HtmlNode(nodeId = '', tag = '', classes = [], id = '', attribute
         //Always preremove the event listeners
         this.eventListeners.forEach(listener => this.domNode.removeEventListener(listener[0], listener[1]));
         this.eventListeners = [];
+
         //The set the attributes with any new listeners
         Object.keys(this.attributes).forEach((attrName) => {
             if (typeof this.attributes[attrName] === 'function') {
@@ -57,11 +58,19 @@ export function HtmlNode(nodeId = '', tag = '', classes = [], id = '', attribute
             }
             this.domNode.setAttribute(attrName, this.attributes[attrName]);
         });
+
+
         const { classList } = this.domNode;
         while (classList.length > 0) {
             classList.remove(classList.item(0));
         }
-        this.classes.forEach(c => classList.add(c));
+
+        let finalList = this.classes;
+        if (attributes.class) {
+            finalList = finalList.concat(attributes.class.split(' '));
+        }
+        finalList.forEach(c => classList.add(c));
+
         if (this.id) {
             this.domNode.id = this.id;
         } else {

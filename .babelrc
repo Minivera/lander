@@ -9,5 +9,12 @@
     ],
     "stage-3"
   ],
-  "plugins": []
+  "plugins": [
+    [
+      "transform-react-jsx",
+      {
+        "pragma": "l"
+      }
+    ]
+  ]
 }
