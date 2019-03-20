@@ -1,27 +1,24 @@
 export default (tag) => {
-    if (typeof tag !== 'string')
-    {
+    if (typeof tag !== 'string') {
         return {};
     }
     //Always crate a div by default
     let tagname = 'div';
     const classes = [];
-    let domId = null;
+    let id = null;
     tag.split('.').forEach((string, index) => {
-        if (string.indexOf('#') >= 0)
-        {
+        if (string.indexOf('#') >= 0) {
             const split = string.split('#');
             if (index === 0)
             {
-                [tagname, domId] = split;
+                [tagname, id] = split;
                 return;
             }
-            domId = split[1]; /*eslint prefer-destructuring: 0*/
+            id = split[1]; /*eslint prefer-destructuring: 0*/
             classes.push(split[0]);
             return;
         }
-        if (index === 0)
-        {
+        if (index === 0) {
             tagname = string;
             return;
         }
@@ -30,6 +27,6 @@ export default (tag) => {
     return {
         tagname,
         classes,
-        domId,
+        id,
     };
 };

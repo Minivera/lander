@@ -1,18 +1,14 @@
-export const lifecycleCreate = 'create';
-export const lifecycleMount = 'mount';
-export const lifecyclePosition = 'position';
-export const lifecycleUpdate = 'update';
-export const lifecycleUnmount = 'unmount';
-export const lifecycleRemove = 'remove';
+const HTML_TAG_TYPE = 'html';
 
-export const lifecycleEvents = [
-    lifecycleCreate,
-    lifecycleMount,
-    lifecyclePosition,
-    lifecycleUpdate,
-    lifecycleUnmount,
-    lifecycleRemove,
-];
+const FUNC_TAG_TYPE = 'func';
 
-export const htmlNodeType = 'HTML';
-export const textNodeType = 'TEXT';
+const TEXT_TAG_TYPE = 'text';
+
+const ARRAY_TAG_TYPE = 'array';
+
+export {
+    HTML_TAG_TYPE,
+    FUNC_TAG_TYPE,
+    TEXT_TAG_TYPE,
+    ARRAY_TAG_TYPE,
+};

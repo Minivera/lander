@@ -1,0 +1,134 @@
+import getChildIndex from '../utils/getVChildIndex';
+import { HtmlNode } from '../nodes/htmlNode';
+import { TextNode } from '../nodes/textNode';
+import nodeMaker from '../vdom/nodeMaker';
+
+import {
+    PATCH_TEXT,
+    PATCH_NODE,
+    PATCH_INSERT,
+    PATCH_REMOVE,
+    PATCH_REPLACE,
+    PATCH_REORDER,
+} from './patchOpTypes';
+
+export default {
+    operations: [],
+
+    add(patchOp) {
+        this.operations.push(patchOp);
+    },
+
+    execute(vtree) {
+        // Execute the operations on the tree
+        this.executeRecursive(null, vtree, vtree instanceof HtmlNode ? vtree : null, []);
+        // Clear the operations when finished
+        this.operations = [];
+    },
+
+    executeRecursive(parent, node, lastDomNode, currentPath) {
+        this
+            .operations
+            .filter(op => JSON.stringify(op.oldNode) === JSON.stringify(node)
+                || JSON.stringify(op.parent) === JSON.stringify(node))
+            .forEach((operation) => {
+                switch (operation.type) {
+                    case PATCH_TEXT:
+                        this.patchText(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_NODE:
+                        this.patchNode(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_INSERT:
+                        this.patchInsert(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_REMOVE:
+                        this.patchRemove(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_REPLACE:
+                        this.patchReplace(parent, node, lastDomNode, operation);
+                        break;
+                    case PATCH_REORDER:
+                        this.patchReorder(parent, node, lastDomNode, operation);
+                        break;
+                    default:
+                }
+            });
+
+        let domNode = lastDomNode;
+        // Update the last dom node if the current node is an HTML node
+        if (node instanceof HtmlNode) {
+            domNode = node;
+        }
+
+        // Try to run recursively on the children of the node
+        if (node.children) {
+            node.children.forEach(
+                child => this.executeRecursive(node, child, domNode, currentPath.concat(node.nodeId)),
+            );
+        }
+    },
+
+    patchText(parent, node, domNode, op) {
+        if (!domNode) {
+            return;
+        }
+
+        node.update(op.node);
+        const nodeIndex = getChildIndex(parent.children, node);
+        domNode.domNode.replaceChild(nodeMaker.createTextNode(node.text), domNode.domNode.childNodes[nodeIndex]);
+    },
+
+    patchNode(parent, node, domNode, op) {
+        node.update(op.node);
+    },
+
+    patchInsert(parent, node, domNode, op) {
+        if (!domNode) {
+            return;
+        }
+
+        op.node.create();
+        node.children.push(op.node);
+        if (op.node instanceof HtmlNode) {
+            const newDomNode = nodeMaker.createElement(op.node.tagname);
+            op.node.mount(newDomNode);
+            domNode.domNode.appendChild(op.node.domNode);
+        } else if (op.node instanceof TextNode) {
+            const newDomNode = nodeMaker.createTextNode(op.node.text);
+            domNode.domNode.appendChild(newDomNode);
+        }
+    },
+
+    patchRemove(parent, node, domNode, op) {
+        if (!domNode) {
+            return;
+        }
+
+        const nodeIndex = getChildIndex(node.children, op.node);
+        if (node instanceof HtmlNode) {
+            domNode.domNode.removeChild(op.node.domNode);
+        } else if (node instanceof TextNode) {
+            domNode.domNode.removeChild(domNode.childNodes[nodeIndex]);
+        }
+        node.children = node.children.slice(0, nodeIndex).concat(parent.children.slice(-nodeIndex));
+        op.node.remove();
+    },
+
+    patchReplace(parent, node, domNode, op) {
+        if (!domNode) {
+            return;
+        }
+
+        if (node instanceof HtmlNode) {
+            const newDomNode = nodeMaker.createElement(op.node.tagname);
+            domNode.domNode.replaceChild(newDomNode, node.domNode);
+        } else if (node instanceof TextNode) {
+            const nodeIndex = getChildIndex(node.parent.children, node);
+            const newDomNode = nodeMaker.createTextNode(op.node.text);
+            domNode.domNode.replaceChild(newDomNode, domNode.childNodes[nodeIndex]);
+        }
+    },
+
+    patchReorder(parent, node, domNode, op) {},
+};
