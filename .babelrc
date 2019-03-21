@@ -1,17 +1,17 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
         "loose": true,
         "modules": false
       }
     ],
-    "stage-3"
+    "@babel/preset-react"
   ],
   "plugins": [
     [
-      "transform-react-jsx",
+      "@babel/plugin-transform-react-jsx",
       {
         "pragma": "l"
       }
