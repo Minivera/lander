@@ -1,1 +1,1 @@
-web: cd conf && npm install && npm build
+web: cd conf && npm run start
