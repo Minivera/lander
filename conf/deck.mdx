@@ -1,0 +1,970 @@
+import { Head, Appear, Steps } from 'mdx-deck';
+import { Invert, Split } from 'mdx-deck/layouts';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { CodeSurfer } from 'mdx-deck-code-surfer';
+
+import l from '../src/vdom/nodeFactory';
+import utils from '../src/vdom/utils';
+import hookState from '../src/hooks/hookState';
+import hookBinding from '../src/hooks/hookBinding';
+
+export { condensed as theme } from 'mdx-deck/themes';
+
+<Head>
+  <title>The Virtual DOM, what is it even?</title>
+</Head>
+
+# The Virtual DOM, what is it even?
+
+export default Invert
+
+---
+
+# Who am I?
+
+## Guillaume St-Pierre
+
+<div>
+    <img 
+        src="https://d1qb2nb5cznatu.cloudfront.net/startups/i/2945505-b32d393c3438940c1ed72d814542bd54-medium_jpg.jpg"
+        alt="logo"
+    />
+    <img 
+        src="https://www.manifold.co/static/images/team/gstpierre.jpg"
+        alt="Me"
+        style={{
+            height: 200,
+        }}
+    />
+</div>
+
+* Software ~~Engineer~~ Developer at manifold, a marketplace for cloud services
+* Wannabe library author
+* Also Carleton U student
+
+export default Invert
+
+---
+
+The Virtual DOM is an abstraction layer over the browser's DOM
+
+![https://medium.com/naukri-engineering/naukriengineering-virtual-dom-fa8019c626b](https://miro.medium.com/max/928/1*CqdIWZy0NMPQhYx2rKzo9g.png)
+
+<div style={{ fontSize: 10, fontStyle: 'italic' }}>
+    Thanks to https://medium.com/naukri-engineering/naukriengineering-virtual-dom-fa8019c626b for the image
+</div>
+
+export default Invert
+
+---
+
+# Why use a virtual DOM?
+
+<ul style={{ textAlign: 'left' }}>
+  <Appear>
+    <li>The virtual DOM allows us to represent the DOM tree using familiar Javascript idioms and objects instead of the messy browser DOM API.</li>
+    <li>This makes traversing, diffing and changing the tree potentially quicker and easier.</li>
+    <li>It also enables us to create tools around this abstraction, like JSX, or even languages like Imba.</li>
+  </Appear>
+</ul>
+
+export default Invert
+
+---
+
+# That looks complex
+
+It is! By looking at the code base of many of the most popular frontend frameworks, we can get a good understanding of how they work and apply that knowledge by building a framework ourselves.
+
+### Let's build one together.
+
+export default Invert
+
+---
+
+# But first, some history
+
+export default Invert
+
+The concept of the Virtual DOM was first developed in React.JS by Facebook. It changed the way we look at frontend development.
+
+Many followed suit, including Vue.js, Hyperscript, Mithril...
+
+<div>
+    <img 
+        src="https://cdn4.iconfinder.com/data/icons/logos-3/600/React.js_logo-512.png"
+        alt="react"
+        style={{
+            height: 50,
+        }}
+    />
+    <img 
+        src="https://vuejs.org/images/logo.png"
+        alt="vue"
+        style={{
+            height: 50,
+        }}
+    />
+    <img 
+        src="https://avatars2.githubusercontent.com/u/19475707?s=280&v=4"
+        alt="mitrhil"
+        style={{
+            height: 50,
+        }}
+    />
+    <img 
+        src="https://user-images.githubusercontent.com/9027592/28045843-f4ddb724-65df-11e7-8f6e-4588fbd8417a.png"
+        alt="snabdom"
+        style={{
+            height: 50,
+        }}
+    />
+</div>
+
+Even browsers went for similar concept with the Web Component standard.
+
+export default Invert
+
+---
+
+# JSX
+
+When they introduced React, Facebook also introduced JSX, a new markup language that allows us to write HTML inside our javascript code.
+
+export default Invert
+
+---
+
+# JSX, before and after
+
+<div style={{
+    textAlign: 'left',
+    display: 'flex',
+    justifyContent: 'space-between',
+}}>
+    <SyntaxHighlighter language='javascript'>
+        {`
+const element = React.createElement(
+    'h1',
+    {className: 'greeting'},
+    'Hello, world!'
+);
+        `}
+    </SyntaxHighlighter>
+    <SyntaxHighlighter language='jsx'> 
+        {`
+const element = (
+    <h1 className="greeting">
+        Hello, world!
+    </h1>
+);
+        `}
+    </SyntaxHighlighter>
+</div>
+
+export default Invert
+
+---
+
+# The virtual DOM tree
+
+The first thing we will need for our virtual DOM implementation is a virtual DOM tree, a nested object structure representing our structure.
+
+React uses a tree where nodes do not know about their parent or siblings, but the DOM itself is more like a undirected graph as each node knows of its parent and siblings.
+
+export default Invert
+
+---
+
+# DOM nodes
+
+The tree is made of nodes which need to include their children, attributes and any data related to their types.
+
+export default Invert
+
+---
+
+# Identify our node types
+
+Let's look at the types of nodes we are likely to need
+
+export default Invert
+
+---
+
+# HTML nodes
+
+An HTML node is able to manage the real DOM node associated to it.
+
+In JSX, HTML nodes are nodes that are created with HTML tags, like `div` or `span`.
+
+export default Invert
+
+---
+
+# Text nodes
+
+A Text node is like an HTML node, but only for pure text.
+
+In the DOM, creating an HTML element and a text element use two different functions, so another node type is useful to us.
+
+In JSX, text nodes are pure string in the structure.
+
+```jsx
+<div>
+    This will create a text node
+</div>
+```
+
+export default Invert
+
+---
+
+# Array nodes
+
+An Array node is a node containing many nodes as its children. Also known as fragments in React.
+
+This does not exists in the DOM, but it helps us with arrays in our virtual tree.
+
+```jsx
+<div>
+    {['one', 'two', 'three'].map(obj => (
+        <span key={obj}>{obj}</span>
+    )}
+</div>
+```
+
+export default Invert
+
+---
+
+# Function nodes
+
+A function node is a node that can rerender its children based on a function. More commonly know as function components.
+
+This make the virtual tree dynamic and more than just a layer over the DOM.
+
+```jsx
+const Component = ({ children }) => (
+    <div>
+        {children}
+    </div>
+);
+
+<Component>
+    I'm the child of a function node!
+</Component>
+```
+
+export default Invert
+
+---
+
+# Object nodes
+
+An object node is a function node on steroids. They're object (Or classes) with a render method, instance methods and potentially lifecycle methods.
+
+In react, these are class components. In Mithril, they're object components.
+
+For our library, we will work without these as functions and hooks are more than enough to get us started.
+
+export default Invert
+
+---
+
+# Building the tree
+
+Building the virtual tree is usually a two step process.
+
+<ol>
+    <Appear>
+        <li>Walk the tree structure, rendering any function or classes along the way.</li>
+        <li>Walk the tree again, mounting any HTML and text node to a DOM node.</li>
+    </Appear>
+</ol>
+
+export default Invert
+
+---
+
+### These two steps are not universal
+
+Some framework do both at the same time.
+
+Some frameworks do not mount the tree and instead use their diffing algorithm.
+
+export default Invert
+
+---
+
+# Updating the tree
+
+Building the tree is great, but what if we want to update it based on some event or data change?
+
+This is done using a diffing algorithm.
+
+export default Invert
+
+---
+
+# 50 shades of diffing
+
+Through my research, I have seen countless diffing algorithms.
+
+I was able to extract three general types of diffing algorithm.
+
+export default Invert
+
+---
+
+# The "virtual diff" method
+
+This algorithm keeps a copy of the virtual dom tree in memory at all times. When an update is requested, a new tree is built.
+
+Both trees are compared and any differences creates a patch, a small object containing what to do for that node.
+
+React uses this method for it's own diffing algorithm, it has the advantage of being "dom-less"
+
+export default Invert
+
+---
+
+# "virtual diff" patching
+
+When we have all the patches ready, they can be applied on the dom and the in-memory tree.
+
+Using this patch system allows us to patch anything using the saved information, not only the DOM or our tree.
+
+export default Invert
+
+---
+
+# The "dom diff" method
+
+This algorithm works very similarly to the virtual compare method, but compares against the real DOM tree instead of an in-memory tree.
+
+Patches are still created from the diff, but we only need to patch the actual DOM tree.
+
+Diffing DOM nodes is supposedly very fast.
+
+export default Invert
+
+---
+
+# "dom diff" patching
+
+The patches from the dom compare method only need to be applied to the DOM itself.
+
+While we aren't locked into using these patches only in a browser, we need the browser to generate them.
+
+export default Invert
+
+---
+
+# The "inline" method
+
+Building and diffing trees is costly, so why not apply updates immediately to the dom?
+
+Rather than request an update to the tree, all changes are made manually or automatically on the DOM nodes.
+
+This can be hard to reason with, to the point where languages were created to abstract that away. See Imba.
+
+export default Invert
+
+---
+
+# But what is patching?
+
+When two trees are diffed, we generate patches for each node.
+
+We save those patches in a registry for later use.
+
+While each framework have their own set of patch types, I have identified a few that will be the most useful to us.
+
+export default Invert
+
+---
+
+## The five patch types
+
+<ul style={{ textAlign: 'left' }}>
+  <Appear>
+    <li>The text patch to update the text of a text node.</li>
+    <li>The node patch to update everything in a node.</li>
+    <li>The insert patch to insert a new child in a parent at a specific index.</li>
+    <li>The replace patch to replace a a child from a parent with another child.</li>
+    <li>The remove patch to remove a child in a parent at a specific index.</li>
+  </Appear>
+</ul>
+
+export default Invert
+
+---
+
+# How to diff
+
+Diffing a tree is a matter of diffing its nodes. We walk the new tree and the compared tree at the same time.
+
+export default Invert
+
+---
+
+<CodeSurfer
+    title="Diffing pseudocode"
+    code={require("!raw-loader!code/diff_pseudocode.txt").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={true}
+    steps={[
+        { notes: "Some pseudocode" },
+        { range: [2, 3], notes: 'A missing old node means we created a new node' },
+        { range: [5, 6], notes: 'A missing mew node means that node was removed' },
+        { range: [8, 9], notes: 'Identical nodes are ignored' },
+        { range: [11, 17], notes: 'Node of the same types need to be updated' },
+        { range: [19, 20], notes: 'Node of completely different types are replaced' },
+    ]}
+/>
+
+export default Invert
+
+---
+
+# How to patch
+
+There are two way I've found to patch a virtual or DOM tree, both have values and drawbacks
+
+1. Walk the tree and look for patches in the registry on each node.
+2. Loop over the patches and walk the tree to find the patched node.
+
+export default Invert
+
+---
+
+# And that's it!
+
+Frameworks implement more features that those basis, like hooks or bindings, but this is all you need to get started.
+
+export default Invert
+
+---
+
+# Let's look at some code now
+
+---
+
+<CodeSurfer
+    title="Base node constructor"
+    code={require("!raw-loader!code/node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Let's start with a constructor for our nodes" },
+        { range: [0, 5], notes: 'The constructor loads the basic things we need' },
+        { range: [6, 9] },
+        { lines: [10], notes: 'A generic mount method' },
+        { lines: [12], notes: 'A generic update method' },
+        { lines: [14], notes: 'A generic remove method' },
+        { lines: [16], notes: 'A generic clone method' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="The HTML node constructor"
+    code={require("!raw-loader!code/html_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "That's big!" },
+        { range: [0, 8], notes: 'We will need some dom information' },
+        { range: [9, 16] },
+        { range: [18, 22], notes: 'A mount method to add the dom node' },
+        { range: [23, 34], notes: 'Updating the node is a matter of changing its attributes and updating the dom' },
+        { range: [45, 82], notes: 'The update dom method, meaty!' },
+        { range: [47, 51], notes: 'Remove any event listeners' },
+        { range: [54, 63], notes: 'Add the event listeners and attributes' },
+        { range: [66, 81], notes: 'Setup the id and classes' },
+        { range: [36, 43], notes: 'We also need to remove the event listeners when the dom node is removed' },
+    ]}
+/>
+
+---
+
+Phew... Ready for the Text node?
+
+---
+
+<CodeSurfer
+    title="The Text node constructor"
+    code={require("!raw-loader!code/text_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "That's small!" },
+        { lines: [1], notes: 'Much cleaner' },
+        { range: [2, 4], notes: 'We don\'t need much' },
+        { range: [8, 10], notes: 'We only need the text really' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="The Array node constructor"
+    code={require("!raw-loader!code/array_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "I want more simple code like this" },
+        { lines: [1], notes: 'We get the children' },
+        { range: [2, 4], notes: 'Save just enough for it to work' },
+        { range: [7, 10], notes: 'Update the children when needed' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="The Function node constructor"
+    code={require("!raw-loader!code/func_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Yes, it's that simple" },
+        { lines: [1], notes: 'Get the render function' },
+        { range: [2, 5], notes: 'Save everything' },
+        { range: [9, 15], notes: 'Render the children. We should make sure we always have an array' },
+        { range: [17, 19], notes: 'Update the attributes for a future render' },
+    ]}
+/>
+
+---
+
+Let's bring all this together with a node factory. In react, it's the `react.createElement` function.
+
+To make sure we are future proof, let's follow the standard of `react.createElement` for our factory.
+
+`function(tag, attributes, ...children)`
+
+---
+
+# Let's add some Hyperscript in there
+
+React expects all tags to be only be HTML tags, but Hyperscript introduced the concept of having the dom class and id directly in the tag.
+
+In react, `react.createElement('div', { id: 'test', className: 'foo bar' })`
+
+In Hyperscript, `h('div#test.foo.bar')`
+
+### Much nicer!
+
+---
+
+<CodeSurfer
+    title="The node factory"
+    code={require("!raw-loader!code/node_factory.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { range: [1, 14], notes: 'The internal factory that creates all the node' },
+        { range: [16, 21], notes: 'Utility function for cases like the pure text node' },
+        { range: [17, 19], notes: 'Vdonizing our nodes makes sure that everything in our tree is a valid node' },
+        { range: [23, 35], notes: 'Our exported factory' },
+        { lines: [2], notes: 'We create a unique id to keep track of our nodes' },
+        { range: [3, 5], notes: 'If we are given a function, it is a function node' },
+        { range: [6, 8], notes: 'If we are given an array, it is an array node' },
+        { range: [9, 11], notes: 'If we had to vodnize this node, probably a text node' },
+        { lines: [12, 13], notes: 'The selector extractor adds the hyperscript functionality for HTML nodes' },
+    ]}
+/>
+
+---
+
+# Why `vnodize`?
+
+Whether using the Hyperscript notation or JSX, both support having pure string as children
+
+<div style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+}}>
+    <SyntaxHighlighter>
+        {`h('div', {}, 'test')`}
+    </SyntaxHighlighter>
+    Or
+    <SyntaxHighlighter>
+        {`<div>test</div>`}
+    </SyntaxHighlighter>
+</div>
+
+"Vnodizing" the children makes sure that even this translates to a node.
+
+---
+
+<CodeSurfer
+    title="Building the tree"
+    code={require("!raw-loader!code/tree_build.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "One recursive function" },
+        { range: [2, 4], notes: 'Render function nodes' },
+        { lines: [6], notes: 'Run recursively' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="Mounting the tree"
+    code={require("!raw-loader!code/tree_mount.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Another recursive function" },
+        { range: [4, 8], notes: 'Create the two types of elements' },
+        { range: [10, 15], notes: `Also patch the DOM while we're at it` },
+        { lines: [18], notes: 'Run recursively' },
+    ]}
+/>
+
+
+---
+
+<CodeSurfer
+    title="Let's try it out"
+    code={require("!raw-loader!code/demo1.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "utils.mount is a utility function to build and mount our tree, l is our node factory" },
+    ]}
+/>
+
+---
+
+<div id="demo1"></div>
+<div style={{ display: 'none' }}>
+    {
+        setTimeout(() => {
+            if (document.querySelector('#demo1 #test')) {
+                return;
+            }
+            utils.mount(document.querySelector('#demo1'), l('div#test.test', {
+                style: 'color: red;',
+            }, 'Hello World'));
+        }, 1000)
+    }
+</div>
+
+---
+
+# Let's improve that and add updates
+
+---
+
+<CodeSurfer
+    title="First, we need to make our build function able to build multiple trees"
+    code={require("!raw-loader!code/tree_build_modified.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "We now add the ability to keep nodes in memory" },
+        { lines: [1], notes: 'First, we need a dictionary of nodes' },
+        { lines: [5], notes: 'When building a node, check if we know of it already' },
+        { range: [8, 11], notes: `If yes and they're different, we update our known node` },
+        { range: [14, 16], notes: 'Clone that node to prevent mutations' },
+        { range: [23, 33], notes: 'If we knew the node, make sure we keep the same ids' },
+        { range: [33, 35], notes: 'Otherwise, do like we did before' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="Now, let's implement our diffing pseudocode"
+    code={require("!raw-loader!code/tree_diff.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Implemented code" },
+        { range: [1, 5], notes: 'Remember our patch types?' },
+        { range: [9, 12], notes: 'Insert if the old node is missing' },
+        { range: [14, 17], notes: 'Remove if the old node is missing' },
+        { range: [19, 31], notes: 'Little modification here to also update if there are event listeners' },
+        { range: [34, 48], notes: 'Patch if different, but of the same type' },
+        { range: [48, 52], notes: 'Replace if different type' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title={`What about patching? We'll use the "walk the tree method"`}
+    code={require("!raw-loader!code/tree_patch.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Implemented code" },
+        { lines: [1], notes: "The patch operations array" },
+        { range: [4, 7], notes: 'Loop on all operations for that node' },
+        { range: [8, 24], notes: 'Handle each patch with its own function' },
+        { range: [35, 44], notes: 'Continue through the tree recursively' },
+        { range: [47, 57], notes: 'Patch text' },
+        { range: [59, 61], notes: 'Patch node' },
+        { range: [63, 78], notes: 'Patch insert' },
+        { range: [80, 96], notes: 'Patch remove' },
+        { range: [98, 111], notes: 'Patch replace' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="Let's try it out"
+    code={require("!raw-loader!code/demo2.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Now we have a function with state" },
+    ]}
+/>
+
+---
+
+<div id="demo2"></div>
+<div style={{ display: 'none' }}>
+    {
+        setTimeout(() => {
+            if (document.querySelector('#demo2 #test')) {
+                return;
+            }
+            
+            let count = 0;
+            
+            function counter() {
+                count += 1;
+                utils.update();
+            }
+            
+            utils.mount(document.querySelector('#demo2'), l(() => l('div#test.test', {
+                style: 'color: red;',
+            }, l('button', {
+               click: counter,
+            }, `${count} click`))));
+        }, 1000)
+    }
+</div>
+
+---
+
+# Maybe something a bit more meaty?
+
+---
+
+<CodeSurfer
+    title="Now with array nodes"
+    code={require("!raw-loader!code/demo3.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "We create a new children for each click" },
+    ]}
+/>
+
+---
+
+<div id="demo3"></div>
+<div style={{ display: 'none' }}>
+    {
+        setTimeout(() => {
+            if (document.querySelector('#demo3 #test')) {
+                return;
+            }
+            
+            let count2 = 0;
+            
+            function counter2() {
+                count2 += 1;
+                utils.update();
+            }
+            
+            utils.mount(document.querySelector('#demo3'), l(() => {
+                const childrenMap = [];
+                for (let i = 0; i < count2; i++) {
+                    childrenMap.push(`child ${i}`);
+                }
+            
+                return l('div#test.test', {
+                    style: 'color: red;',
+                }, [
+                    l('button', {
+                        click: counter2,
+                    }, `${count2} click`),
+                    count2 % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
+                    l('div.test3', {}, childrenMap),
+                ]);
+            }));
+        }, 1000)
+    }
+</div>
+
+---
+
+# What about hooks?
+
+Hooks are the newest feature from React that allows us to add state to function component, but how to they work exactly?
+
+---
+
+Behind the scenes, hooks are very simple and work in a three step process.
+
+1. Set the current node instance (Usually a function node) of the hooks manager
+2. Run the function node render method
+3. Set the current node instance back to what it was before
+
+React adds a lot to this with reducers and past states, but at their core, hooks are nothing but those three steps.
+
+---
+
+<CodeSurfer
+    title="We need to update the render code of our function node"
+    code={require("!raw-loader!code/func_node_hooks.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Implemented code" },
+        { range: [12, 32], notes: 'The new render method' },
+        { range: [13, 14], notes: 'Save the old current element and set the node' },
+        { range: [16, 19], notes: 'Render' },
+        { lines: [21], notes: 'Reset the current element to the previous one' },
+    ]}
+/>
+
+
+---
+
+<CodeSurfer
+    title="The hooks manager itself"
+    code={require("!raw-loader!code/hooks_store.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "That's pretty simple" },
+        { lines: [2], notes: 'The current element' },
+        { lines: [4], notes: 'A map of elements and their states' },
+        { range: [6, 18], notes: 'The useState function, named hookState here' },
+        { lines: [7], notes: 'Get the id from the current element' },
+        { range: [8, 12], notes: 'Check if the map has that element, if not, set to the initial state' },
+        { range: [14, 17], notes: 'Return the state value and the state setter' },
+        { lines: [21], notes: 'Export a function to use that hook' },
+    ]}
+/>
+
+---
+
+<CodeSurfer
+    title="Rewrite our counter example with hooks"
+    code={require("!raw-loader!code/demo4.js").default}
+    lang="javascript"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "It looks much better now" },
+    ]}
+/>
+
+---
+
+<div id="demo4"></div>
+<div style={{ display: 'none' }}>
+    {
+        setTimeout(() => {
+            if (document.querySelector('#demo4 #test')) {
+                return;
+            }
+            
+            utils.mount(document.querySelector('#demo4'), l(() => {
+                const [count, setCount] = hookState(0);
+            
+                const setState = () => {
+                    setCount(count + 1);
+                    utils.update();
+                };
+            
+                const childrenMap = [];
+                for (let i = 0; i < count; i++) {
+                    childrenMap.push(`child ${i}`);
+                }
+            
+                return l('div#test.test', {
+                    style: 'color: red;',
+                }, [
+                    l('button', {
+                        click: setState,
+                    }, `${count} click`),
+                    count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
+                    l('div.test3', {}, childrenMap),
+                ]);
+            }));
+        }, 1000)
+    }
+</div>
+
+---
+
+# What about JSX?
+
+We've been working without JSX up until this point, but can we add JSX to our library?
+
+---
+
+### Yes!
+
+Facebook wrote an amazing babel plugin called `@babel/plugin-transform-react-jsx`, all we have to do is configure it.
+
+```json
+{
+  ...,
+  "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "pragma": "l"
+      }
+    ]
+  ],
+  ...
+}
+```
+
+---
+
+<CodeSurfer
+    title="Our counter example with JSX"
+    code={require("!raw-loader!code/demo5.js").default}
+    lang="jsx"
+    showNumbers={false}
+    dark={false}
+    steps={[
+        { notes: "Fancy!" },
+    ]}
+/>

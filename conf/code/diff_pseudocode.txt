@@ -1,0 +1,20 @@
+function diff (oldNode, newNode)
+    if the old node does not exists
+        create an insert patch
+
+    if the new node does not exists
+        Create a remove patch
+
+    if both node are identical
+        recursively run diff on its children
+
+    else if both node are different, but of the same type
+        if a text node
+            create a text patch
+
+        otherwise
+            create a node patch
+            recursively run diff on its children
+
+    else if both node are not of the same type
+        create a replace patch

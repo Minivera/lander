@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "forwardjs",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "mdx-deck deck.mdx --port 8080",
+    "build": "mdx-deck build deck.mdx",
+    "help": "mdx-deck"
+  },
+  "devDependencies": {
+    "mdx-deck": "^1.10.2",
+    "raw-loader": "^2.0.0"
+  },
+  "dependencies": {
+    "mdx-deck-code-surfer": "^0.5.5"
+  }
+}
