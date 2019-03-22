@@ -1,1 +1,0 @@
-web: cd conf && npm install && npm run start

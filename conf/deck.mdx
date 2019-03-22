@@ -2,6 +2,7 @@ import { Head, Appear, Steps } from 'mdx-deck';
 import { Invert, Split } from 'mdx-deck/layouts';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { CodeSurfer } from 'mdx-deck-code-surfer';
+import { RunCode } from './RunCode';
 
 import l from '../src/vdom/nodeFactory';
 import utils from '../src/vdom/utils';
@@ -654,19 +655,11 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 ---
 
-<div id="demo1"></div>
-<div style={{ display: 'none' }}>
-    {
-        setTimeout(() => {
-            if (document.querySelector('#demo1 #test')) {
-                return;
-            }
-            utils.mount(document.querySelector('#demo1'), l('div#test.test', {
-                style: 'color: red;',
-            }, 'Hello World'));
-        }, 1000)
-    }
-</div>
+<RunCode code={element => {
+   utils.mount(element, l('div#test.test', {
+       style: 'color: red;',
+   }, 'Hello World'));
+}}/>
 
 ---
 
@@ -747,29 +740,20 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 ---
 
-<div id="demo2"></div>
-<div style={{ display: 'none' }}>
-    {
-        setTimeout(() => {
-            if (document.querySelector('#demo2 #test')) {
-                return;
-            }
-            
-            let count = 0;
-            
-            function counter() {
-                count += 1;
-                utils.update();
-            }
-            
-            utils.mount(document.querySelector('#demo2'), l(() => l('div#test.test', {
-                style: 'color: red;',
-            }, l('button', {
-               click: counter,
-            }, `${count} click`))));
-        }, 1000)
-    }
-</div>
+<RunCode code={element => {
+   let count = 0;
+   
+   function counter() {
+       count += 1;
+       utils.update();
+   }
+   
+   utils.mount(element, l(() => l('div#test.test', {
+       style: 'color: red;',
+   }, l('button', {
+      click: counter,
+   }, `${count} click`))));
+}}/>
 
 ---
 
@@ -790,40 +774,31 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 ---
 
-<div id="demo3"></div>
-<div style={{ display: 'none' }}>
-    {
-        setTimeout(() => {
-            if (document.querySelector('#demo3 #test')) {
-                return;
-            }
-            
-            let count2 = 0;
-            
-            function counter2() {
-                count2 += 1;
-                utils.update();
-            }
-            
-            utils.mount(document.querySelector('#demo3'), l(() => {
-                const childrenMap = [];
-                for (let i = 0; i < count2; i++) {
-                    childrenMap.push(`child ${i}`);
-                }
-            
-                return l('div#test.test', {
-                    style: 'color: red;',
-                }, [
-                    l('button', {
-                        click: counter2,
-                    }, `${count2} click`),
-                    count2 % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
-                    l('div.test3', {}, childrenMap),
-                ]);
-            }));
-        }, 1000)
-    }
-</div>
+<RunCode code={element => {
+   let count = 0;
+                   
+   function counter() {
+       count += 1;
+       utils.update();
+   }
+   
+   utils.mount(element, l(() => {
+       const childrenMap = [];
+       for (let i = 0; i < count; i++) {
+           childrenMap.push(`child ${i}`);
+       }
+   
+       return l('div#test.test', {
+           style: 'color: red;',
+       }, [
+           l('button', {
+               click: counter,
+           }, `${count} click`),
+           count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
+           l('div.test3', {}, childrenMap),
+       ]);
+   }));
+}}/>
 
 ---
 
@@ -894,40 +869,31 @@ React adds a lot to this with reducers and past states, but at their core, hooks
 
 ---
 
-<div id="demo4"></div>
-<div style={{ display: 'none' }}>
-    {
-        setTimeout(() => {
-            if (document.querySelector('#demo4 #test')) {
-                return;
-            }
-            
-            utils.mount(document.querySelector('#demo4'), l(() => {
-                const [count, setCount] = hookState(0);
-            
-                const setState = () => {
-                    setCount(count + 1);
-                    utils.update();
-                };
-            
-                const childrenMap = [];
-                for (let i = 0; i < count; i++) {
-                    childrenMap.push(`child ${i}`);
-                }
-            
-                return l('div#test.test', {
-                    style: 'color: red;',
-                }, [
-                    l('button', {
-                        click: setState,
-                    }, `${count} click`),
-                    count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
-                    l('div.test3', {}, childrenMap),
-                ]);
-            }));
-        }, 1000)
-    }
-</div>
+<RunCode code={element => {
+   utils.mount(element, l(() => {
+       const [count, setCount] = hookState(0);
+   
+       const setState = () => {
+           setCount(count + 1);
+           utils.update();
+       };
+   
+       const childrenMap = [];
+       for (let i = 0; i < count; i++) {
+           childrenMap.push(`child ${i}`);
+       }
+   
+       return l('div#test.test', {
+           style: 'color: red;',
+       }, [
+           l('button', {
+               click: setState,
+           }, `${count} click`),
+           count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
+           l('div.test3', {}, childrenMap),
+       ]);
+   }));
+}}/>
 
 ---
 

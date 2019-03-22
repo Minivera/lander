@@ -1,5 +1,5 @@
 export default {
-    $window: window,
+    $window: typeof window !== 'undefined' ? window : {},
 
     init($window) {
         this.$window = $window;
