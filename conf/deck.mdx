@@ -47,7 +47,7 @@ export default Invert
 
 ---
 
-The Virtual DOM is an abstraction layer over the browser's DOM
+The Virtual DOM is an abstraction layer over the browser DOM
 
 ![https://medium.com/naukri-engineering/naukriengineering-virtual-dom-fa8019c626b](https://miro.medium.com/max/928/1*CqdIWZy0NMPQhYx2rKzo9g.png)
 
@@ -63,8 +63,8 @@ export default Invert
 
 <ul style={{ textAlign: 'left' }}>
   <Appear>
-    <li>The virtual DOM allows us to represent the DOM tree using familiar Javascript idioms and objects instead of the messy browser DOM API.</li>
-    <li>This makes traversing, diffing and changing the tree potentially quicker and easier.</li>
+    <li>The virtual DOM allows us to represent the DOM tree using familiar Javascript instead of the messy browser DOM API.</li>
+    <li>This makes traversing, diffing and changing the tree quicker and easier.</li>
     <li>It also enables us to create tools around this abstraction, like JSX, or even languages like Imba.</li>
   </Appear>
 </ul>
@@ -75,7 +75,7 @@ export default Invert
 
 # That looks complex
 
-It is! By looking at the code base of many of the most popular frontend frameworks, we can get a good understanding of how they work and apply that knowledge by building a framework ourselves.
+It is! Thankfully, by looking at the code base of many of the most popular frontend frameworks, we can get a good understanding of how they work and apply that knowledge by building a framework ourselves.
 
 ### Let's build one together.
 
@@ -167,17 +167,9 @@ export default Invert
 
 ---
 
-# The virtual DOM tree
+# The virtual DOM tree and nodes
 
 The first thing we will need for our virtual DOM implementation is a virtual DOM tree, a nested object structure representing our structure.
-
-React uses a tree where nodes do not know about their parent or siblings, but the DOM itself is more like a undirected graph as each node knows of its parent and siblings.
-
-export default Invert
-
----
-
-# DOM nodes
 
 The tree is made of nodes which need to include their children, attributes and any data related to their types.
 
@@ -209,11 +201,12 @@ A Text node is like an HTML node, but only for pure text.
 
 In the DOM, creating an HTML element and a text element use two different functions, so another node type is useful to us.
 
-In JSX, text nodes are pure string in the structure.
+In JSX, text nodes are pure strings.
 
 ```jsx
 <div>
     This will create a text node
+    {'This will also create a text node'}
 </div>
 ```
 
@@ -243,7 +236,7 @@ export default Invert
 
 A function node is a node that can rerender its children based on a function. More commonly know as function components.
 
-This make the virtual tree dynamic and more than just a layer over the DOM.
+This make the virtual tree dynamic, but also adds the complexity of having to patch the DOM.
 
 ```jsx
 const Component = ({ children }) => (
@@ -267,7 +260,7 @@ An object node is a function node on steroids. They're object (Or classes) with 
 
 In react, these are class components. In Mithril, they're object components.
 
-For our library, we will work without these as functions and hooks are more than enough to get us started.
+For our framework, we will ignore these as functions and hooks are more than enough to get us started.
 
 export default Invert
 
@@ -312,7 +305,7 @@ export default Invert
 
 Through my research, I have seen countless diffing algorithms.
 
-I was able to extract three general types of diffing algorithm.
+I was able to extract three general types of diffing algorithms.
 
 export default Invert
 
@@ -461,8 +454,7 @@ export default Invert
     dark={false}
     steps={[
         { notes: "Let's start with a constructor for our nodes" },
-        { range: [0, 5], notes: 'The constructor loads the basic things we need' },
-        { range: [6, 9] },
+        { range: [1, 9], notes: 'The constructor loads the basic things we need' },
         { lines: [10], notes: 'A generic mount method' },
         { lines: [12], notes: 'A generic update method' },
         { lines: [14], notes: 'A generic remove method' },
@@ -480,8 +472,7 @@ export default Invert
     dark={false}
     steps={[
         { notes: "That's big!" },
-        { range: [0, 8], notes: 'We will need some dom information' },
-        { range: [9, 16] },
+        { range: [1, 16], notes: 'We will need some dom information' },
         { range: [18, 22], notes: 'A mount method to add the dom node' },
         { range: [23, 34], notes: 'Updating the node is a matter of changing its attributes and updating the dom' },
         { range: [45, 82], notes: 'The update dom method, meaty!' },
@@ -506,9 +497,8 @@ Phew... Ready for the Text node?
     dark={false}
     steps={[
         { notes: "That's small!" },
-        { lines: [1], notes: 'Much cleaner' },
-        { range: [2, 4], notes: 'We don\'t need much' },
-        { range: [8, 10], notes: 'We only need the text really' },
+        { range: [1, 4], notes: 'Much cleaner' },
+        { range: [8, 10], notes: 'We only need the text' },
     ]}
 />
 
@@ -522,8 +512,7 @@ Phew... Ready for the Text node?
     dark={false}
     steps={[
         { notes: "I want more simple code like this" },
-        { lines: [1], notes: 'We get the children' },
-        { range: [2, 4], notes: 'Save just enough for it to work' },
+        { range: [1, 4], notes: 'We only get the children' },
         { range: [7, 10], notes: 'Update the children when needed' },
     ]}
 />
@@ -540,7 +529,7 @@ Phew... Ready for the Text node?
         { notes: "Yes, it's that simple" },
         { lines: [1], notes: 'Get the render function' },
         { range: [2, 5], notes: 'Save everything' },
-        { range: [9, 15], notes: 'Render the children. We should make sure we always have an array' },
+        { range: [9, 15], notes: 'Render the children. We should make sure children are always in an array' },
         { range: [17, 19], notes: 'Update the attributes for a future render' },
     ]}
 />
@@ -549,7 +538,7 @@ Phew... Ready for the Text node?
 
 Let's bring all this together with a node factory. In react, it's the `react.createElement` function.
 
-To make sure we are future proof, let's follow the standard of `react.createElement` for our factory.
+To make sure we are ready for JSX, let's follow the standard of `react.createElement` for our factory.
 
 `function(tag, attributes, ...children)`
 
@@ -677,7 +666,7 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
         { notes: "We now add the ability to keep nodes in memory" },
         { lines: [1], notes: 'First, we need a dictionary of nodes' },
         { lines: [5], notes: 'When building a node, check if we know of it already' },
-        { range: [8, 11], notes: `If yes and they're different, we update our known node` },
+        { range: [8, 11], notes: `If not or they're different, we update our known node` },
         { range: [14, 16], notes: 'Clone that node to prevent mutations' },
         { range: [23, 33], notes: 'If we knew the node, make sure we keep the same ids' },
         { range: [33, 35], notes: 'Otherwise, do like we did before' },
@@ -804,17 +793,17 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 # What about hooks?
 
-Hooks are the newest feature from React that allows us to add state to function component, but how to they work exactly?
+Hooks are the newest feature from React that allows us to add state to function components as if they were a class component, but how to they work exactly?
 
 ---
 
-Behind the scenes, hooks are very simple and work in a three step process.
+## Behind the scenes, hooks are very simple and work in a three step process.
 
 1. Set the current node instance (Usually a function node) of the hooks manager
 2. Run the function node render method
 3. Set the current node instance back to what it was before
 
-React adds a lot to this with reducers and past states, but at their core, hooks are nothing but those three steps.
+**React adds a lot to this with reducers and keeping track of state changes, but hooks boil down to those three steps.**
 
 ---
 
@@ -826,7 +815,7 @@ React adds a lot to this with reducers and past states, but at their core, hooks
     dark={false}
     steps={[
         { notes: "Implemented code" },
-        { range: [12, 32], notes: 'The new render method' },
+        { range: [12, 23], notes: 'The new render method' },
         { range: [13, 14], notes: 'Save the old current element and set the node' },
         { range: [16, 19], notes: 'Render' },
         { lines: [21], notes: 'Reset the current element to the previous one' },

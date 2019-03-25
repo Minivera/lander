@@ -1,5 +1,3 @@
-import l from '../../src/vdom/nodeFactory';
-
 let count = 0;
 
 const counter = () => {
