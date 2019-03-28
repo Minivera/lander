@@ -2,6 +2,7 @@ import { Head, Appear, Steps } from 'mdx-deck';
 import { Invert, Split } from 'mdx-deck/layouts';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { CodeSurfer } from 'mdx-deck-code-surfer';
+import syntaxTheme from "prism-react-renderer/themes/shadesOfPurple";
 import { RunCode } from './RunCode';
 
 import l from '../src/vdom/nodeFactory';
@@ -9,7 +10,7 @@ import utils from '../src/vdom/utils';
 import hookState from '../src/hooks/hookState';
 import hookBinding from '../src/hooks/hookBinding';
 
-export { condensed as theme } from 'mdx-deck/themes';
+export { yellow as theme } from 'mdx-deck/themes';
 
 <Head>
   <title>The Virtual DOM, what is it even?</title>
@@ -17,7 +18,26 @@ export { condensed as theme } from 'mdx-deck/themes';
 
 # The Virtual DOM, what is it even?
 
-export default Invert
+---
+
+## What should you take out of this talk?
+
+* Understand what the virtual DOM and what are it's components
+* Understand how to diff and patch a virtual DOM tree
+* Demystify the magic behind hooks and JSX
+
+---
+
+## Table of contents
+
+1. Introduction
+2. VDOM tree and nodes
+3. Building the nodes
+4. Building the tree
+5. Diffing the tree
+6. Patching the tree
+7. What about hooks?
+8. JSX
 
 ---
 
@@ -40,52 +60,18 @@ export default Invert
 </div>
 
 * Software ~~Engineer~~ Developer at manifold, a marketplace for cloud services
-* Wannabe library author
+* Wannabe package author
 * Also Carleton U student
-
-export default Invert
-
----
-
-The Virtual DOM is an abstraction layer over the browser DOM
-
-![https://medium.com/naukri-engineering/naukriengineering-virtual-dom-fa8019c626b](https://miro.medium.com/max/928/1*CqdIWZy0NMPQhYx2rKzo9g.png)
-
-<div style={{ fontSize: 10, fontStyle: 'italic' }}>
-    Thanks to https://medium.com/naukri-engineering/naukriengineering-virtual-dom-fa8019c626b for the image
-</div>
-
-export default Invert
 
 ---
 
 # Why use a virtual DOM?
 
-<ul style={{ textAlign: 'left' }}>
-  <Appear>
-    <li>The virtual DOM allows us to represent the DOM tree using familiar Javascript instead of the messy browser DOM API.</li>
-    <li>This makes traversing, diffing and changing the tree quicker and easier.</li>
-    <li>It also enables us to create tools around this abstraction, like JSX, or even languages like Imba.</li>
-  </Appear>
-</ul>
-
-export default Invert
+The virtual DOM allows us to represent the DOM tree using familiar Javascript instead of the messy browser DOM API.
 
 ---
 
-# That looks complex
-
-It is! Thankfully, by looking at the code base of many of the most popular frontend frameworks, we can get a good understanding of how they work and apply that knowledge by building a framework ourselves.
-
-### Let's build one together.
-
-export default Invert
-
----
-
-# But first, some history
-
-export default Invert
+# Some history
 
 The concept of the Virtual DOM was first developed in React.JS by Facebook. It changed the way we look at frontend development.
 
@@ -124,19 +110,11 @@ Many followed suit, including Vue.js, Hyperscript, Mithril...
 
 Even browsers went for similar concept with the Web Component standard.
 
-export default Invert
-
 ---
 
 # JSX
 
-When they introduced React, Facebook also introduced JSX, a new markup language that allows us to write HTML inside our javascript code.
-
-export default Invert
-
----
-
-# JSX, before and after
+Facebook introduced JSX along with the vritual DOM, giving us the ability to add HTML inside javascript
 
 <div style={{
     textAlign: 'left',
@@ -163,7 +141,22 @@ const element = (
     </SyntaxHighlighter>
 </div>
 
-export default Invert
+---
+
+# Some benchmarks
+
+<img
+    style={{
+        height: '60vh',
+    }}
+    src="https://cdn-images-1.medium.com/max/2400/1*El9cBVFHxRG36XD8KNjA_g.png"
+/>
+
+Make your own at https://github.com/gothinkster/realworld
+
+---
+
+### Let's build one together.
 
 ---
 
@@ -173,13 +166,25 @@ The first thing we will need for our virtual DOM implementation is a virtual DOM
 
 The tree is made of nodes which need to include their children, attributes and any data related to their types.
 
-export default Invert
+Let's look at the types of nodes we are likely to need
 
 ---
 
-# Identify our node types
-
-Let's look at the types of nodes we are likely to need
+<CodeSurfer
+    title="Base node constructor"
+    code={require("!raw-loader!code/node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "Let's start with a constructor for our nodes" },
+        { range: [1, 9], notes: 'The constructor loads the basic things we need' },
+        { lines: [10], notes: 'A generic mount method' },
+        { lines: [12], notes: 'A generic update method' },
+        { lines: [14], notes: 'A generic remove method' },
+        { lines: [16], notes: 'A generic clone method' },
+    ]}
+/>
 
 export default Invert
 
@@ -191,7 +196,32 @@ An HTML node is able to manage the real DOM node associated to it.
 
 In JSX, HTML nodes are nodes that are created with HTML tags, like `div` or `span`.
 
+---
+
+<CodeSurfer
+    title="The HTML node constructor"
+    code={require("!raw-loader!code/html_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "That's big!" },
+        { range: [1, 16], notes: 'We will need some dom information' },
+        { range: [18, 22], notes: 'A mount method to add the dom node' },
+        { range: [23, 34], notes: 'Updating the node is a matter of changing its attributes and updating the dom' },
+        { range: [45, 82], notes: 'The update dom method, meaty!' },
+        { range: [47, 51], notes: 'Remove any event listeners' },
+        { range: [54, 63], notes: 'Add the event listeners and attributes' },
+        { range: [66, 81], notes: 'Setup the id and classes' },
+        { range: [36, 43], notes: 'We also need to remove the event listeners when the dom node is removed' },
+    ]}
+/>
+
 export default Invert
+
+---
+
+Phew... Ready for the Text node?
 
 ---
 
@@ -210,6 +240,21 @@ In JSX, text nodes are pure strings.
 </div>
 ```
 
+---
+
+<CodeSurfer
+    title="The Text node constructor"
+    code={require("!raw-loader!code/text_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "That's small!" },
+        { range: [1, 4], notes: 'Much cleaner' },
+        { range: [8, 10], notes: 'We only need the text' },
+    ]}
+/>
+
 export default Invert
 
 ---
@@ -227,6 +272,21 @@ This does not exists in the DOM, but it helps us with arrays in our virtual tree
     )}
 </div>
 ```
+
+---
+
+<CodeSurfer
+    title="The Array node constructor"
+    code={require("!raw-loader!code/array_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "I want more simple code like this" },
+        { range: [1, 4], notes: 'We only get the children' },
+        { range: [7, 10], notes: 'Update the children when needed' },
+    ]}
+/>
 
 export default Invert
 
@@ -250,6 +310,23 @@ const Component = ({ children }) => (
 </Component>
 ```
 
+---
+
+<CodeSurfer
+    title="The Function node constructor"
+    code={require("!raw-loader!code/func_node_constructor.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "Yes, it's that simple" },
+        { lines: [1], notes: 'Get the render function' },
+        { range: [2, 5], notes: 'Save everything' },
+        { range: [9, 15], notes: 'Render the children. We should make sure children are always in an array' },
+        { range: [17, 19], notes: 'Update the attributes for a future render' },
+    ]}
+/>
+
 export default Invert
 
 ---
@@ -262,297 +339,15 @@ In react, these are class components. In Mithril, they're object components.
 
 For our framework, we will ignore these as functions and hooks are more than enough to get us started.
 
-export default Invert
-
 ---
 
-# Building the tree
-
-Building the virtual tree is usually a two step process.
-
-<ol>
-    <Appear>
-        <li>Walk the tree structure, rendering any function or classes along the way.</li>
-        <li>Walk the tree again, mounting any HTML and text node to a DOM node.</li>
-    </Appear>
-</ol>
-
-export default Invert
-
----
-
-### These two steps are not universal
-
-Some framework do both at the same time.
-
-Some frameworks do not mount the tree and instead use their diffing algorithm.
-
-export default Invert
-
----
-
-# Updating the tree
-
-Building the tree is great, but what if we want to update it based on some event or data change?
-
-This is done using a diffing algorithm.
-
-export default Invert
-
----
-
-# 50 shades of diffing
-
-Through my research, I have seen countless diffing algorithms.
-
-I was able to extract three general types of diffing algorithms.
-
-export default Invert
-
----
-
-# The "virtual diff" method
-
-This algorithm keeps a copy of the virtual dom tree in memory at all times. When an update is requested, a new tree is built.
-
-Both trees are compared and any differences creates a patch, a small object containing what to do for that node.
-
-React uses this method for it's own diffing algorithm, it has the advantage of being "dom-less"
-
-export default Invert
-
----
-
-# "virtual diff" patching
-
-When we have all the patches ready, they can be applied on the dom and the in-memory tree.
-
-Using this patch system allows us to patch anything using the saved information, not only the DOM or our tree.
-
-export default Invert
-
----
-
-# The "dom diff" method
-
-This algorithm works very similarly to the virtual compare method, but compares against the real DOM tree instead of an in-memory tree.
-
-Patches are still created from the diff, but we only need to patch the actual DOM tree.
-
-Diffing DOM nodes is supposedly very fast.
-
-export default Invert
-
----
-
-# "dom diff" patching
-
-The patches from the dom compare method only need to be applied to the DOM itself.
-
-While we aren't locked into using these patches only in a browser, we need the browser to generate them.
-
-export default Invert
-
----
-
-# The "inline" method
-
-Building and diffing trees is costly, so why not apply updates immediately to the dom?
-
-Rather than request an update to the tree, all changes are made manually or automatically on the DOM nodes.
-
-This can be hard to reason with, to the point where languages were created to abstract that away. See Imba.
-
-export default Invert
-
----
-
-# But what is patching?
-
-When two trees are diffed, we generate patches for each node.
-
-We save those patches in a registry for later use.
-
-While each framework have their own set of patch types, I have identified a few that will be the most useful to us.
-
-export default Invert
-
----
-
-## The five patch types
-
-<ul style={{ textAlign: 'left' }}>
-  <Appear>
-    <li>The text patch to update the text of a text node.</li>
-    <li>The node patch to update everything in a node.</li>
-    <li>The insert patch to insert a new child in a parent at a specific index.</li>
-    <li>The replace patch to replace a a child from a parent with another child.</li>
-    <li>The remove patch to remove a child in a parent at a specific index.</li>
-  </Appear>
-</ul>
-
-export default Invert
-
----
-
-# How to diff
-
-Diffing a tree is a matter of diffing its nodes. We walk the new tree and the compared tree at the same time.
-
-export default Invert
-
----
-
-<CodeSurfer
-    title="Diffing pseudocode"
-    code={require("!raw-loader!code/diff_pseudocode.txt").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={true}
-    steps={[
-        { notes: "Some pseudocode" },
-        { range: [2, 3], notes: 'A missing old node means we created a new node' },
-        { range: [5, 6], notes: 'A missing mew node means that node was removed' },
-        { range: [8, 9], notes: 'Identical nodes are ignored' },
-        { range: [11, 17], notes: 'Node of the same types need to be updated' },
-        { range: [19, 20], notes: 'Node of completely different types are replaced' },
-    ]}
-/>
-
-export default Invert
-
----
-
-# How to patch
-
-There are two way I've found to patch a virtual or DOM tree, both have values and drawbacks
-
-1. Walk the tree and look for patches in the registry on each node.
-2. Loop over the patches and walk the tree to find the patched node.
-
-export default Invert
-
----
-
-# And that's it!
-
-Frameworks implement more features that those basis, like hooks or bindings, but this is all you need to get started.
-
-export default Invert
-
----
-
-# Let's look at some code now
-
----
-
-<CodeSurfer
-    title="Base node constructor"
-    code={require("!raw-loader!code/node_constructor.js").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={false}
-    steps={[
-        { notes: "Let's start with a constructor for our nodes" },
-        { range: [1, 9], notes: 'The constructor loads the basic things we need' },
-        { lines: [10], notes: 'A generic mount method' },
-        { lines: [12], notes: 'A generic update method' },
-        { lines: [14], notes: 'A generic remove method' },
-        { lines: [16], notes: 'A generic clone method' },
-    ]}
-/>
-
----
-
-<CodeSurfer
-    title="The HTML node constructor"
-    code={require("!raw-loader!code/html_node_constructor.js").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={false}
-    steps={[
-        { notes: "That's big!" },
-        { range: [1, 16], notes: 'We will need some dom information' },
-        { range: [18, 22], notes: 'A mount method to add the dom node' },
-        { range: [23, 34], notes: 'Updating the node is a matter of changing its attributes and updating the dom' },
-        { range: [45, 82], notes: 'The update dom method, meaty!' },
-        { range: [47, 51], notes: 'Remove any event listeners' },
-        { range: [54, 63], notes: 'Add the event listeners and attributes' },
-        { range: [66, 81], notes: 'Setup the id and classes' },
-        { range: [36, 43], notes: 'We also need to remove the event listeners when the dom node is removed' },
-    ]}
-/>
-
----
-
-Phew... Ready for the Text node?
-
----
-
-<CodeSurfer
-    title="The Text node constructor"
-    code={require("!raw-loader!code/text_node_constructor.js").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={false}
-    steps={[
-        { notes: "That's small!" },
-        { range: [1, 4], notes: 'Much cleaner' },
-        { range: [8, 10], notes: 'We only need the text' },
-    ]}
-/>
-
----
-
-<CodeSurfer
-    title="The Array node constructor"
-    code={require("!raw-loader!code/array_node_constructor.js").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={false}
-    steps={[
-        { notes: "I want more simple code like this" },
-        { range: [1, 4], notes: 'We only get the children' },
-        { range: [7, 10], notes: 'Update the children when needed' },
-    ]}
-/>
-
----
-
-<CodeSurfer
-    title="The Function node constructor"
-    code={require("!raw-loader!code/func_node_constructor.js").default}
-    lang="javascript"
-    showNumbers={false}
-    dark={false}
-    steps={[
-        { notes: "Yes, it's that simple" },
-        { lines: [1], notes: 'Get the render function' },
-        { range: [2, 5], notes: 'Save everything' },
-        { range: [9, 15], notes: 'Render the children. We should make sure children are always in an array' },
-        { range: [17, 19], notes: 'Update the attributes for a future render' },
-    ]}
-/>
-
----
-
-Let's bring all this together with a node factory. In react, it's the `react.createElement` function.
-
-To make sure we are ready for JSX, let's follow the standard of `react.createElement` for our factory.
+# Building Nodes
+
+Nodes are created through the use of a node factory. In react, it's the `react.createElement` function.
+                                                     
+To make sure we are ready for JSX, let's follow the standard signature of `react.createElement` for our factory.
 
 `function(tag, attributes, ...children)`
-
----
-
-# Let's add some Hyperscript in there
-
-React expects all tags to be only be HTML tags, but Hyperscript introduced the concept of having the dom class and id directly in the tag.
-
-In react, `react.createElement('div', { id: 'test', className: 'foo bar' })`
-
-In Hyperscript, `h('div#test.foo.bar')`
-
-### Much nicer!
 
 ---
 
@@ -561,7 +356,7 @@ In Hyperscript, `h('div#test.foo.bar')`
     code={require("!raw-loader!code/node_factory.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { range: [1, 14], notes: 'The internal factory that creates all the node' },
         { range: [16, 21], notes: 'Utility function for cases like the pure text node' },
@@ -574,6 +369,8 @@ In Hyperscript, `h('div#test.foo.bar')`
         { lines: [12, 13], notes: 'The selector extractor adds the hyperscript functionality for HTML nodes' },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -599,18 +396,59 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 ---
 
+# Let's add some Hyperscript in there
+
+React expects all tags to be only be HTML tags, but Hyperscript introduced the concept of having the dom class and id directly in the tag.
+
+In react:
+```javascript
+react.createElement('div', { id: 'test', className: 'foo bar' })
+```
+
+In Hyperscript: 
+```javascript
+h('div#test.foo.bar')
+```
+
+### Much nicer!
+
+---
+
+# Building the tree
+
+Building the virtual tree is usually a two step process.
+
+<ol>
+    <Appear>
+        <li>Walk the tree structure, rendering any function or classes along the way.</li>
+        <li>Walk the tree again, mounting any HTML and text node to a DOM node.</li>
+    </Appear>
+</ol>
+
+---
+
+### These two steps are not universal
+
+Some framework do both at the same time.
+
+Some frameworks do not mount the tree and instead use their diffing algorithm.
+
+---
+
 <CodeSurfer
     title="Building the tree"
     code={require("!raw-loader!code/tree_build.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "One recursive function" },
         { range: [2, 4], notes: 'Render function nodes' },
         { lines: [6], notes: 'Run recursively' },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -619,7 +457,7 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/tree_mount.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Another recursive function" },
         { range: [4, 8], notes: 'Create the two types of elements' },
@@ -628,6 +466,7 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     ]}
 />
 
+export default Invert
 
 ---
 
@@ -636,11 +475,13 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/demo1.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "utils.mount is a utility function to build and mount our tree, l is our node factory" },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -652,7 +493,73 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
 
 ---
 
-# Let's improve that and add updates
+# Updating the tree
+
+Building the tree is great, but what if we want to update it based on some event or data change?
+
+This is done using a diffing algorithm.
+
+---
+
+# 50 shades of diffing
+
+Through my research, I have seen countless diffing algorithms.
+
+I was able to sort most of them into three diffing methods, let's look at them.
+
+---
+
+# The "virtual diff" method
+
+This algorithm keeps a copy of the virtual dom tree in memory at all times. When an update is requested, a new tree is built.
+
+Both trees are compared and any differences creates a patch, a small object containing what to do for that node.
+
+React uses this method for it's own diffing algorithm, it has the advantage of being "dom-less"
+
+We will be using this method
+
+---
+
+# "virtual diff" patching
+
+When we have all the patches ready, they can be applied on the dom and the in-memory tree.
+
+Using this patch system allows us to patch anything using the saved information, not only the DOM or our tree.
+
+---
+
+# The "dom diff" method
+
+This algorithm works very similarly to the virtual compare method, but compares against the real DOM tree instead of an in-memory tree.
+
+Patches are still created from the diff, but we only need to patch the actual DOM tree.
+
+Diffing DOM nodes is supposedly very fast.
+
+---
+
+# "dom diff" patching
+
+The patches from the dom compare method only need to be applied to the DOM itself.
+
+While we aren't locked into using these patches only in a browser, we need the browser to generate them.
+
+---
+
+# The "inline" method
+
+Building and diffing trees is costly, so why not apply updates immediately to the dom?
+
+Rather than request an update to the tree, all changes are made manually or automatically on the DOM nodes.
+
+This can be hard to reason with, to the point where languages were created to abstract that away. See Imba.
+
+---
+
+# How to diff
+
+Diffing a tree is a matter of diffing its nodes. We walk the new tree and the compared tree at the same time.
 
 ---
 
@@ -661,7 +568,7 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/tree_build_modified.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "We now add the ability to keep nodes in memory" },
         { lines: [1], notes: 'First, we need a dictionary of nodes' },
@@ -673,6 +580,8 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     ]}
 />
 
+export default Invert
+
 ---
 
 <CodeSurfer
@@ -680,7 +589,7 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/tree_diff.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Implemented code" },
         { range: [1, 5], notes: 'Remember our patch types?' },
@@ -692,14 +601,47 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     ]}
 />
 
+export default Invert
+
+---
+
+# But what is patching?
+
+When two trees are diffed, we generate patches for each node.
+
+We save those patches in a registry for later use.
+
+While each framework have their own set of patch types, I have identified a few that will be the most useful to us.
+
+---
+
+## The five patch types
+
+<ul style={{ textAlign: 'left' }}>
+    <li>The text patch to update the text of a text node.</li>
+    <li>The node patch to update everything in a node.</li>
+    <li>The insert patch to insert a new child in a parent at a specific index.</li>
+    <li>The replace patch to replace a a child from a parent with another child.</li>
+    <li>The remove patch to remove a child in a parent at a specific index.</li>
+</ul>
+
+---
+
+# How to patch
+
+There are two way I've found to patch a virtual or DOM tree, both have values and drawbacks
+
+1. Walk the tree and look for patches in the registry on each node.
+2. Loop over the patches and walk the tree to find the patched node.
+
 ---
 
 <CodeSurfer
-    title={`What about patching? We'll use the "walk the tree method"`}
+    title={`We'll use the "walk the tree method"`}
     code={require("!raw-loader!code/tree_patch.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Implemented code" },
         { lines: [1], notes: "The patch operations array" },
@@ -714,6 +656,8 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     ]}
 />
 
+export default Invert
+
 ---
 
 <CodeSurfer
@@ -721,11 +665,13 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/demo2.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Now we have a function with state" },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -755,11 +701,13 @@ Whether using the Hyperscript notation or JSX, both support having pure string a
     code={require("!raw-loader!code/demo3.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "We create a new children for each click" },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -797,9 +745,47 @@ Hooks are the newest feature from React that allows us to add state to function 
 
 ---
 
+# State, before hooks
+
+In React, if you wanted to have state with your component, we used to have to implement a class component.
+
+```jsx
+class Component extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            open: false
+        };
+    }
+    
+    setOpen = () => { this.setState({ open: true }) }
+
+    render() { 
+        const { open } = this.state;
+        ...
+    }
+}
+```
+
+---
+
+# State, after hooks
+
+With hooks, state is now available to function components! React keeps tracks of the function's instance for providing the state.
+
+```jsx
+const Component = () => {
+    const [open, setOpen] = useState(false);
+    
+    ...
+};
+```
+
+---
+
 ## Behind the scenes, hooks are very simple and work in a three step process.
 
-1. Set the current node instance (Usually a function node) of the hooks manager
+1. Set the current function node instance of the hooks manager
 2. Run the function node render method
 3. Set the current node instance back to what it was before
 
@@ -812,7 +798,7 @@ Hooks are the newest feature from React that allows us to add state to function 
     code={require("!raw-loader!code/func_node_hooks.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Implemented code" },
         { range: [12, 23], notes: 'The new render method' },
@@ -822,6 +808,7 @@ Hooks are the newest feature from React that allows us to add state to function 
     ]}
 />
 
+export default Invert
 
 ---
 
@@ -830,7 +817,7 @@ Hooks are the newest feature from React that allows us to add state to function 
     code={require("!raw-loader!code/hooks_store.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "That's pretty simple" },
         { lines: [2], notes: 'The current element' },
@@ -843,6 +830,8 @@ Hooks are the newest feature from React that allows us to add state to function 
     ]}
 />
 
+export default Invert
+
 ---
 
 <CodeSurfer
@@ -850,11 +839,13 @@ Hooks are the newest feature from React that allows us to add state to function 
     code={require("!raw-loader!code/demo4.js").default}
     lang="javascript"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "It looks much better now" },
     ]}
 />
+
+export default Invert
 
 ---
 
@@ -918,8 +909,39 @@ Facebook wrote an amazing babel plugin called `@babel/plugin-transform-react-jsx
     code={require("!raw-loader!code/demo5.js").default}
     lang="jsx"
     showNumbers={false}
-    dark={false}
+    theme={syntaxTheme}
     steps={[
         { notes: "Fancy!" },
     ]}
 />
+
+export default Invert
+
+---
+
+# What did we just create?
+
+We created, within the scope of this 40 minutes talk, a "feature complete" front-end framework for creating dynamic UIs with some of the latest trends baked in.
+
+---
+
+Do you want to play with our creation? Fork it and create your own?
+
+The entire code + other experiments/failures are available on github!
+
+https://github.com/Minivera/lander
+
+---
+
+<CodeSurfer
+    title="Here is how I managed to have the demos work in mdx-deck"
+    code={require("!raw-loader!RunCode.js").default}
+    lang="jsx"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "Ref magic" },
+    ]}
+/>
+
+export default Invert
