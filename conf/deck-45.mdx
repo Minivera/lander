@@ -63,8 +63,6 @@ export { yellow as theme } from 'mdx-deck/themes';
 * Wannabe package author
 * Also Carleton U student
 
-https://github.com/Minivera
-
 ---
 
 # Why use a virtual DOM?
@@ -77,7 +75,7 @@ The virtual DOM allows us to represent the DOM tree using familiar JavaScript in
 
 The concept of the Virtual DOM was first developed in React.JS by Facebook. It changed the way we look at frontend development.
 
-Many followed suit, including Vue.js, Mithril...
+Many followed suit, including Vue.js, Hyperscript, Mithril...
 
 <div>
     <img 
@@ -110,6 +108,8 @@ Many followed suit, including Vue.js, Mithril...
     />
 </div>
 
+Even browsers went for similar concept with the Web Component standard.
+
 ---
 
 # JSX
@@ -140,6 +140,19 @@ const element = (
         `}
     </SyntaxHighlighter>
 </div>
+
+---
+
+# Some benchmarks
+
+<img
+    style={{
+        height: '60vh',
+    }}
+    src="https://cdn-images-1.medium.com/max/2400/1*El9cBVFHxRG36XD8KNjA_g.png"
+/>
+
+Make your own at https://github.com/gothinkster/realworld
 
 ---
 
@@ -338,6 +351,24 @@ To make sure we are ready for JSX, let's follow the standard signature of `react
 
 ---
 
+# Let's add some Hyperscript in there
+
+React expects all tags to be only be HTML tags, but Hyperscript introduced the concept of having the DOM class and id directly in the tag.
+
+In React:
+```javascript
+react.createElement('div', { id: 'test', className: 'foo bar' })
+```
+
+In Hyperscript: 
+```javascript
+h('div#test.foo.bar')
+```
+
+### Much nicer!
+
+---
+
 <CodeSurfer
     title="The node factory"
     code={require("!raw-loader!code/node_factory.js").default}
@@ -346,13 +377,14 @@ To make sure we are ready for JSX, let's follow the standard signature of `react
     theme={syntaxTheme}
     steps={[
         { range: [1, 14], notes: 'The internal factory that creates all the nodes' },
+        { range: [16, 21], notes: 'Utility function for cases like the pure text node' },
+        { range: [17, 19], notes: 'Vdonizing our nodes makes sure that everything in our tree is a valid node' },
+        { range: [23, 35], notes: 'Our exported factory' },
         { lines: [2], notes: 'We create a unique id to keep track of our nodes' },
         { range: [3, 5], notes: 'If we are given a function, it is a function node' },
         { range: [6, 8], notes: 'If we are given an array, it is an array node' },
         { range: [9, 11], notes: 'If we had to vondize this node, probably a text node' },
-        { range: [16, 21], notes: 'Utility function for cases like the pure text node' },
-        { range: [17, 19], notes: 'Vdonizing our nodes makes sure that everything in our tree is a valid node' },
-        { range: [23, 35], notes: 'Our exported factory' },
+        { lines: [12, 13], notes: 'The selector extractor adds the Hyperscript functionality for HTML nodes' },
     ]}
 />
 
@@ -362,7 +394,7 @@ export default Invert
 
 # Why `vnodize`?
 
-It is possible to have a pure string as a children inside our tree structure.
+Whether using the Hyperscript notation or JSX, both support having pure string as children
 
 <div style={{
     display: 'flex',
@@ -370,7 +402,7 @@ It is possible to have a pure string as a children inside our tree structure.
     justifyContent: 'space-around',
 }}>
     <SyntaxHighlighter>
-        {`react.createElement('div', {}, 'test')`}
+        {`h('div', {}, 'test')`}
     </SyntaxHighlighter>
     Or
     <SyntaxHighlighter>
@@ -384,7 +416,7 @@ It is possible to have a pure string as a children inside our tree structure.
 
 # Building the tree
 
-We will build the three in a two step process.
+Building the virtual tree is usually a two step process.
 
 <ol>
     <Appear>
@@ -392,6 +424,14 @@ We will build the three in a two step process.
         <li>Walk the tree again, mounting any HTML and text node to a DOM node.</li>
     </Appear>
 </ol>
+
+---
+
+### These two steps are not universal
+
+Some frameworks do both at the same time.
+
+Some frameworks do not mount the tree and instead use their diffing algorithm.
 
 ---
 
@@ -461,11 +501,65 @@ This is done using a diffing algorithm.
 
 ---
 
-# Diffing the tree
+# 50 shades of diffing
 
-Our algorithm keeps a copy of the virtual DOM tree in memory at all times. When an update is requested, a new tree is built.
+Through my research, I have seen countless diffing algorithms.
+
+I was able to sort most of them into three diffing methods, let's look at them.
+
+---
+
+# The "virtual diff" method
+
+This algorithm keeps a copy of the virtual DOM tree in memory at all times. When an update is requested, a new tree is built.
 
 Both trees are compared and any differences creates a patch, a small object containing what to do for that node.
+
+React uses this method for its own diffing algorithm, it has the advantage of being "DOM-less"
+
+We will be using this method
+
+---
+
+# "virtual diff" patching
+
+When we have all the patches ready, they can be applied on the DOM and the in-memory tree.
+
+Using this patch system allows us to patch anything using the saved information, not only the DOM or our tree.
+
+---
+
+# The "DOM diff" method
+
+This algorithm works very similarly to the virtual compare method, but compares against the real DOM tree instead of an in-memory tree.
+
+Patches are still created from the diff, but we only need to patch the actual DOM tree.
+
+Diffing DOM nodes is supposedly very fast.
+
+---
+
+# "DOM diff" patching
+
+The patches from the DOM compare method only need to be applied to the DOM itself.
+
+While we aren't locked into using these patches only in a browser, we need the browser to generate them.
+
+---
+
+# The "inline" method
+
+Building and diffing trees is costly, so why not apply updates immediately to the DOM?
+
+Rather than request an update to the tree, all changes are made manually or automatically on the DOM nodes.
+
+This can be hard to reason with, to the point where languages were created to abstract that away. See Imba.
+
+---
+
+# How to diff
+
+Diffing a tree is a matter of diffing its nodes. We walk the new tree and the compared tree at the same time.
 
 ---
 
@@ -498,10 +592,10 @@ export default Invert
     theme={syntaxTheme}
     steps={[
         { notes: "Implemented code" },
-        { range: [1, 5], notes: "We'll look at the patch types soon" },
+        { range: [1, 5], notes: 'Remember our patch types?' },
         { range: [9, 12], notes: 'Insert if the old node is missing' },
         { range: [14, 17], notes: 'Remove if the new node is missing' },
-        { range: [19, 31], notes: 'If both nodes are equal, run recursively and update if the node has event listeners' },
+        { range: [19, 31], notes: 'Little modification here to also update if there are event listeners' },
         { range: [34, 48], notes: 'Patch if different, but of the same type' },
         { range: [48, 52], notes: 'Replace if different type' },
     ]}
@@ -535,12 +629,15 @@ While each framework has their own set of patch types, I have identified a few t
 
 # How to patch
 
-To patch the DOM tree, we walk the old virtual Tree and look for patches on each of its nodes.
+There are two way I've found to patch a virtual or DOM tree, both have values and drawbacks
+
+1. Walk the tree and look for patches in the registry on each node.
+2. Loop over the patches and walk the tree to find the patched node.
 
 ---
 
 <CodeSurfer
-    title="Patching implementation"
+    title={`We'll use the "walk the tree method"`}
     code={require("!raw-loader!code/tree_patch.js").default}
     lang="javascript"
     showNumbers={false}
@@ -565,6 +662,42 @@ export default Invert
 
 <CodeSurfer
     title="Let's try it out"
+    code={require("!raw-loader!code/demo2.js").default}
+    lang="javascript"
+    showNumbers={false}
+    theme={syntaxTheme}
+    steps={[
+        { notes: "Now we have a function with state" },
+    ]}
+/>
+
+export default Invert
+
+---
+
+<RunCode code={element => {
+   let count = 0;
+   
+   function counter() {
+       count += 1;
+       utils.update();
+   }
+   
+   utils.mount(element, l(() => l('div#test.test', {
+       style: 'color: red;',
+   }, l('button', {
+      click: counter,
+   }, `${count} click`))));
+}}/>
+
+---
+
+# Maybe something a bit more meaty?
+
+---
+
+<CodeSurfer
+    title="Now with array nodes"
     code={require("!raw-loader!code/demo3.js").default}
     lang="javascript"
     showNumbers={false}
@@ -620,7 +753,9 @@ In React, if you wanted to have state with your component, we used to have to im
 class Component extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { open: false };
+        this.state = {
+            open: false
+        };
     }
     
     setOpen = () => { this.setState({ open: true }) }
@@ -648,7 +783,7 @@ const Component = () => {
 
 ---
 
-## Behind the scenes, hooks work in a three step process.
+## Behind the scenes, hooks are very simple and work in a three step process.
 
 1. Set the current function node instance of the hooks manager
 2. Run the function node render method
