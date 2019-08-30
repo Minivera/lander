@@ -1,39 +1,36 @@
-import l from './vdom/nodeFactory';
-import utils from './vdom/utils';
-import hookState from './hooks/hookState';
-import hookBinding from './hooks/hookBinding';
+import l from './vdom/factory';
+import Lander from './vdom/tree';
+import useState from './hooks/useState';
+import useEffect from './hooks/useEffect';
 
-utils.mount(document.querySelector('#root'), l(() => {
-    const [count, setCount] = hookState(0);
+const Message = ({ message, children }) => l('div', {}, [message, ...children]);
 
-    const setState = () => {
-        setCount(count + 1);
-        utils.update();
-    };
+const App = () => {
+    const [count, setCount] = useState(0);
+    const [user, setUser] = useState(null);
 
-    const childrenMap = [];
-    for (let i = 0; i < count; i++) {
-        childrenMap.push(`child ${i}`);
-    }
+    useEffect(async () => {
+        const result = await window.fetch('https://jsonplaceholder.typicode.com/users/1');
+        const value = await result.json();
+        setUser(value);
+    });
 
-    return l('div#test.test', {
-        style: 'color: red;',
-    }, [
-        'Hello World',
-        l('button', {
-            click: setState,
-        }, `${count} click`),
-        count % 2 === 0 ? l('span.even', {}, 'Even') : l('span.odd', {}, 'Odd'),
-        l('div.test2', {}, [
-            l(() => {
-                const [ getVal, setVal ] = hookBinding('');
+    return l(
+        'div',
+        {
+            style: 'display: flex; flex-direction: column; align-items: start',
+        },
+        l(Message, { message: 'Hello, World!' }),
+        l('span', {}, `Count is ${count}`),
+        l(
+            'button',
+            {
+                click: () => setCount(count + 1),
+            },
+            'Click to increase count'
+        ),
+        !user ? 'loading' : l('pre', {}, JSON.stringify(user, null, 2))
+    );
+};
 
-                return l('input', {
-                    value: getVal,
-                    input: setVal,
-                });
-            }),
-        ]),
-        l('div.test3', {}, childrenMap),
-    ]);
-}));
+new Lander(() => l(App, {})).mount(document.querySelector('#root'));

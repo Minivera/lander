@@ -1,24 +1,20 @@
-import { TEXT_TAG_TYPE } from '../utils/constants';
+import { Node } from '../vdom/node';
 
-export function TextNode(id = '', text = '') {
-    this.nodeId = id;
-    this.text = text;
-    this.children = [];
-    this.type = TEXT_TAG_TYPE;
+export class TextNode extends Node {
+    constructor(nodeId, text = '') {
+        super(nodeId);
+        this.text = text;
+    }
 
-    this.create = () => {};
+    update({ text }) {
+        this.text = text;
+    }
 
-    this.mount = () => {};
+    toString() {
+        return this.text;
+    }
 
-    this.update = ({ text: newText }) => {
-        this.text = newText;
-    };
-
-    this.remove = () => {};
-
-    this.toString = () => this.text;
-
-    this.clone = () => new TextNode(this.nodeId, this.text);
+    clone() {
+        return new TextNode(this.nodeId, this.text);
+    }
 }
-
-export default TextNode;

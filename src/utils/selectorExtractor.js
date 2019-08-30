@@ -1,32 +1,34 @@
-export default (tag) => {
+export default tag => {
     if (typeof tag !== 'string') {
         return {};
     }
-    //Always crate a div by default
-    let tagname = 'div';
-    const classes = [];
-    let id = null;
+    // Always create a div by default
+    const selector = {
+        tagname: 'div',
+        classes: [],
+    };
     tag.split('.').forEach((string, index) => {
         if (string.indexOf('#') >= 0) {
             const split = string.split('#');
-            if (index === 0)
-            {
-                [tagname, id] = split;
+            if (index === 0) {
+                [selector.tagname, selector.id] = split;
                 return;
             }
-            id = split[1]; /*eslint prefer-destructuring: 0*/
-            classes.push(split[0]);
+            const [domClass, id] = split;
+            selector.id = id;
+            if (selector.classes) {
+                selector.classes.push(domClass);
+            }
             return;
         }
         if (index === 0) {
-            tagname = string;
+            selector.tagname = string;
             return;
         }
-        classes.push(string);
+
+        if (selector.classes) {
+            selector.classes.push(string);
+        }
     });
-    return {
-        tagname,
-        classes,
-        id,
-    };
+    return selector;
 };
