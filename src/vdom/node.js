@@ -16,14 +16,14 @@ export class Node {
         this.domNode = null;
     }
 
-    get firstChildren() {
+    get firstChild() {
         if (this.children.length) {
             return this.children[0];
         }
         return null;
     }
 
-    get lastChildren() {
+    get lastChild() {
         if (this.children.length) {
             return this.children[this.children.length - 1];
         }

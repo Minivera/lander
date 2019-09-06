@@ -18,6 +18,9 @@ export const nodesEqual = (oldNode, newNode) => {
         if (!oldNode.classes.every(element => newNode.classes.includes(element))) {
             return false;
         }
+        if (oldNode.eventListeners.length || newNode.eventListeners.length) {
+            return false;
+        }
         return JSON.stringify(oldNode.attributes) === JSON.stringify(newNode.attributes);
     }
     if (oldNode instanceof TextNode && newNode instanceof TextNode) {

@@ -29,11 +29,6 @@ export class Differ {
             oldTree.children.forEach((child, index) => {
                 this.diff(oldTree, child, newTree.children[index] ? newTree.children[index] : null);
             });
-
-            // If the node is an HTML node, always update the listeners
-            if (oldTree instanceof HTMLNode) {
-                this.patches.push(new PatchAttributes(oldTree, newTree));
-            }
         } else if (childrenEquals(oldTree, newTree)) {
             // If the nodes are different, but have similar children
             // Update the attributes

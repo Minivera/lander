@@ -4,7 +4,8 @@ import { HTMLNode } from '../nodes/htmlNode';
 import { hooksManager } from '../hooks/hooksManager';
 
 // eslint-disable-next-line no-use-before-define
-const vnodeizeChildren = child => (typeof child === 'string' ? createNode({ text: child }, {}) : child);
+const vnodeizeChildren = child =>
+    typeof child === 'string' || typeof child === 'number' ? createNode({ text: child }, {}) : child;
 
 const createNode = (tag, attributes, ...children) => {
     if (typeof tag === 'function') {
@@ -17,13 +18,21 @@ const createNode = (tag, attributes, ...children) => {
         hooksManager.currentElement = oldElement;
         return rendered;
     }
-    if (tag.text) {
+    if (typeof tag.text !== 'undefined') {
         return new TextNode('', tag.text);
     }
 
     const selector = selectorExtractor(tag);
     if (!selector.tagname) {
         throw new Error(`Invalid selector received ${tag}`);
+    }
+    if (attributes && attributes.class) {
+        selector.classes = selector.classes.concat(attributes.class.split(' '));
+        delete attributes.class;
+    }
+    if (attributes && attributes.id) {
+        selector.id = attributes.id;
+        delete attributes.id;
     }
     return new HTMLNode(
         '',

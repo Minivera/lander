@@ -6,22 +6,29 @@ export class HTMLNode extends Node {
         this.tag = tag;
         this.id = id;
         this.classes = classes;
-        this.attributes = attributes;
+        this.attributes = attributes || {};
         this.children = children;
         this.eventListeners = [];
     }
 
     mount(domNode) {
         super.mount(domNode);
-        this.setDomAttributes();
+        this.setDomAttributes([]);
     }
 
     update({ tag, classes, id, attributes }) {
+        const toRemove = [];
+        Object.keys(this.attributes).forEach(key => {
+            if (typeof attributes[key] === 'undefined') {
+                toRemove.push(key);
+            }
+        });
+
         this.tag = tag;
         this.classes = classes;
         this.id = id;
         this.attributes = attributes;
-        this.setDomAttributes();
+        this.setDomAttributes(toRemove);
     }
 
     remove() {
@@ -31,18 +38,30 @@ export class HTMLNode extends Node {
         this.eventListeners = [];
     }
 
-    setDomAttributes() {
+    setDomAttributes(toRemove) {
         // Always preremove the event listeners
         this.eventListeners.forEach(listener => this.domNode.removeEventListener(listener[0], listener[1]));
         this.eventListeners = [];
 
+        toRemove.forEach(key => this.domNode.removeAttribute(key));
+
         // The set the attributes with any new listeners
         Object.keys(this.attributes).forEach(attrName => {
             if (typeof this.attributes[attrName] === 'function') {
-                const caller = event => this.attributes[attrName].call(this, event, this);
+                const caller = event => {
+                    this.attributes[attrName].call(this, event, this);
+                };
+
                 this.domNode.addEventListener(attrName, caller);
                 // Save the listener for later removal
                 this.eventListeners.push([attrName, caller]);
+                return;
+            }
+
+            if (this.attributes[attrName] === true) {
+                this.domNode.setAttribute(attrName, '');
+                return;
+            } else if (this.attributes[attrName] === false) {
                 return;
             }
             this.domNode.setAttribute(attrName, this.attributes[attrName]);
