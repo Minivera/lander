@@ -8,6 +8,7 @@ export class TextNode extends Node {
 
     update({ text }) {
         this.text = text;
+        this.domNode.textContent = text;
     }
 
     toString() {
