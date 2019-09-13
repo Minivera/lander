@@ -1,5 +1,4 @@
 import { nodesEqual, childrenEquals } from '../utils/diffNodes';
-import { HTMLNode } from '../nodes/htmlNode';
 
 import { PatchRemove } from './patchRemove';
 import { PatchInsert } from './patchInsert';
@@ -24,19 +23,24 @@ export class Differ {
         }
 
         // If the nodes are the same
-        if (nodesEqual(oldTree, newTree)) {
+        if (nodesEqual(oldTree, newTree) && childrenEquals(oldTree, newTree)) {
             // Run on children
             oldTree.children.forEach((child, index) => {
                 this.diff(oldTree, child, newTree.children[index] ? newTree.children[index] : null);
             });
-        } else if (childrenEquals(oldTree, newTree)) {
-            // If the nodes are different, but have similar children
-            // Update the attributes
+        } else if (oldTree.constructor === newTree.constructor) {
+            // If the nodes are of the same type, but are otherwise different
             this.patches.push(new PatchAttributes(oldTree, newTree));
-            // Run on children
-            oldTree.children.forEach((child, index) => {
-                this.diff(oldTree, child, newTree.children[index]);
-            });
+            // Run on the children of the node with the bigger length of children
+            if (oldTree.children.length >= newTree.children.length) {
+                oldTree.children.forEach((child, index) => {
+                    this.diff(oldTree, child, newTree.children[index]);
+                });
+            } else {
+                newTree.children.forEach((child, index) => {
+                    this.diff(oldTree, oldTree.children[index], child);
+                });
+            }
         } else {
             // Otherwise, fully replace the tree
             this.patches.push(new PatchReplace(parent, oldTree, newTree));
