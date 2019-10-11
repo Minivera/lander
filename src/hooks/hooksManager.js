@@ -2,9 +2,9 @@ export const hooksManager = {
     currentTree: null,
     currentElement: null,
 
-    // Due to how we implemented the rendering (Very simplified, only returns HTML and text nodes), this Map will fill
-    // up with potentially unmounted functions. Unless the application immense, this should not be a problem, but
-    // fixing this would most likely require a total rewrite.
+    // Due to how we implemented the rendering (Very simplified, only returns HTML and text nodes), this Map will likely
+    // break in real applications. This is because we use the functions as keys directly. Render the same function twice
+    // and the state breaks! It works for this simplified implementation though.
     state: new Map(),
 
     prepareRender() {
