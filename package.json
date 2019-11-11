@@ -5,7 +5,7 @@
   "browser": "dist/lander.browser.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production tsdx build",
-    "start": "parcel src/index.html --open",
+    "start": "parcel src/index.html -p 8080",
     "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
     "prepublishOnly": "npm run build",
     "test": "tsdx test --env=jsdom",
@@ -35,33 +35,32 @@
   },
   "homepage": "https://github.com/minivera/lander#readme",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/plugin-transform-runtime": "^7.5.5",
-    "@types/jest": "^24.0.13",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
-    "@typescript-eslint/parser": "^2.0.0",
-    "eslint": "^6.0.1",
-    "eslint-config-prettier": "6.0.0",
-    "eslint-config-standard": "^13.0.1",
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@testing-library/jest-dom": "^4.2.3",
+    "@types/jest": "^24.0.22",
+    "@typescript-eslint/eslint-plugin": "^2.6.1",
+    "@typescript-eslint/parser": "^2.6.1",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-jest": "^22.6.4",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-jest": "^23.0.3",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "jest": "^24.8.0",
-    "parcel-bundler": "^1.12.3",
-    "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "tsdx": "^0.8.0",
-    "typescript": "^3.4.5"
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^24.9.0",
+    "parcel": "^2.0.0-alpha.2.1",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.1.0",
+    "tsdx": "^0.11.0",
+    "typescript": "^3.7.2"
   },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
     ]
   },
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.0.0"
-  }
+  "dependencies": {}
 }

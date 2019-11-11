@@ -1,30 +1,33 @@
-import { ExtendedElement } from './extender';
+import { VirtualNode } from '../types/lander';
 
-export const TextNodeExtender = (node: Text): Text =>
-    Object.assign(node, {
-        landerListeners: [],
+interface TextNodeConfig {
+    text: string;
+}
 
-        addEventListener: node.addEventListener,
+// eslint-disable-next-line no-undef
+export class TextNode extends VirtualNode {
+    text: string;
 
-        removeEventListener: node.removeEventListener,
+    constructor({ text }: TextNodeConfig) {
+        super();
+        this.text = text;
+    }
 
-        attachEventListeners: () => {},
+    render(): void {}
 
-        landerApply: () => {},
+    equals(otherNode: VirtualNode): boolean {
+        if (!(otherNode instanceof TextNode)) {
+            return false;
+        }
 
-        landerDiff(newElement: Text): void {
-            const el = (this as unknown) as Text;
+        return this.text === otherNode.text;
+    }
 
-            if (el.nodeType !== newElement.nodeType || el.nodeValue !== newElement.nodeValue) {
-                // If both node are different, replace from parent.
-                el.replaceWith(newElement);
+    childrenEquals(): boolean {
+        return true;
+    }
 
-                // Reattach the event listeners if necessary
-                const replaced = (el as unknown) as ExtendedElement;
-                const toReplace = (newElement as unknown) as ExtendedElement;
-                if (replaced.attachEventListeners) {
-                    replaced.attachEventListeners(toReplace.landerListeners);
-                }
-            }
-        },
-    } as ExtendedElement);
+    toString(): string {
+        return this.text;
+    }
+}
