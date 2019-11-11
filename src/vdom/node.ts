@@ -1,53 +1,37 @@
-import uid from '../utils/uid';
-import selectorExtractor from '../utils/selectorExtractor';
-import { TextNodeExtender } from '../nodes/textNode';
-import { HtmlNodeExtender } from '../nodes/htmlNode';
-import { ExtendedElement } from '../nodes/extender';
-import { injectorsManager } from './injectorsManager';
+import { TreeNode } from '../nodes/treeNode';
+import { TextNode } from '../nodes/textNode';
+import { ArrayNode } from '../nodes/arrayNode';
+import { HtmlNode } from '../nodes/htmlNode';
+import { Attributes, ChildTypes, NodeCreator, TagTypes, TextNodeTag, VirtualNode } from '../types/lander';
 
-const vdonizeChildren = (child: Lander.ChildTypes): Node =>
+const vdonizeChildren = (child: ChildTypes): VirtualNode =>
     typeof child === 'string'
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         ? createNode({ text: child as string }, {})
-        : (child as Node);
+        : (child as VirtualNode);
 
-export const createNode: Lander.NodeCreator = (
-    tag: Lander.TagTypes,
-    attributes: Lander.Attributes,
-    ...children: Lander.ChildTypes[]
-): Node => {
+export const createNode: NodeCreator = (
+    tag: TagTypes,
+    attributes: Attributes,
+    ...children: ChildTypes[]
+) => {
     if (typeof tag === 'function') {
-        const oldElement = injectorsManager.currentElement;
-        injectorsManager.currentElement = tag;
-        injectorsManager.prepareRender();
-
-        const returnValue = (tag as Lander.FunctionNode)(attributes, ...children.map(vdonizeChildren));
-
-        injectorsManager.currentElement = oldElement;
-        return returnValue;
+        return new TreeNode({
+            factory: tag,
+            attributes,
+            children: children.map(vdonizeChildren),
+        });
     }
-    if ((tag as Lander.TextNodeTag).text) {
-        const node = document.createTextNode((tag as Lander.TextNodeTag).text);
-        return TextNodeExtender(node);
+    if (Array.isArray(tag)) {
+        return new ArrayNode({ children: children.map(vdonizeChildren) });
+    }
+    if ((tag as TextNodeTag).text) {
+        return new TextNode({ text: (tag as TextNodeTag).text });
     }
 
-    const selector = selectorExtractor(tag);
-    if (!selector.tagname) {
-        throw new Error(`Invalid selector received ${tag}`);
-    }
-    if (selector.id) {
-        attributes.id = selector.id;
-    }
-    if (selector.classes && selector.classes.length) {
-        attributes.class = selector.classes.join(' ');
-    }
-    const node = document.createElement(selector.tagname);
-
-    children.forEach((child: Lander.ChildTypes) => node.appendChild(vdonizeChildren(child)));
-    const createdNode: ExtendedElement = HtmlNodeExtender(node) as unknown as ExtendedElement;
-    createdNode.landerApply(attributes);
-
-    return createdNode as unknown as Node;
+    return new HtmlNode({
+        tag: (tag as string),
+        attributes,
+        children: children.map(vdonizeChildren),
+    });
 };
-
-export default createNode;
