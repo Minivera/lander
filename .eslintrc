@@ -27,13 +27,16 @@
         "functions": "only-multiline"
       }
     ],
-    "indent": ["error", 4],
 
     // options to emulate prettier setup
     "semi": ["error", "always"],
-    "max-len": ["error", { "code": 120 }],
+    "max-len": "off",
     "template-curly-spacing": ["error", "never"],
     "arrow-parens": ["error", "as-needed"],
+    "indent": "off",
+
+    // Enable prettier errors
+    "prettier/prettier": "error",
 
     // standard.js
     "space-before-function-paren": [

@@ -1,0 +1,20 @@
+{
+  "name": "lander-demo",
+  "version": "0.0.1",
+  "description": "Demo of a TODO MVC application using lander",
+  "private": true,
+  "scripts": {
+    "start": "parcel src/index.html -p 8080"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/classnames": "^2.2.10",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "@webcomponents/custom-elements": "^1.4.2",
+    "classnames": "^2.2.6",
+    "lander": "file:../packages/lander"
+  }
+}
