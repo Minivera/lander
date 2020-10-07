@@ -3,7 +3,7 @@
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "baseUrl": "./src",
-    "declaration": true,
+    "declaration": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
@@ -18,8 +18,10 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "esnext",
-    "types": ["node", "jest"]
+    "types": ["node", "jest", "lander"],
+    "jsx": "react",
+    "jsxFactory": "h"
   },
-  "include": ["packages/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

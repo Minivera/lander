@@ -4,13 +4,13 @@
   "description": "A VDOM engine made for the modern web",
   "browser": "dist/lander.browser.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build",
-    "start": "parcel src/index.html -p 8080",
-    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
-    "prepublishOnly": "npm run build",
-    "test": "tsdx test --env=jsdom",
-    "test:coverage": "tsdx test --env=jsdom --coverage",
-    "clean": "git clean -fdX ."
+    "publish": "lerna publish",
+    "start": "lerna run start --loglevel debug",
+    "postinstall": "lerna bootstrap --no-ci",
+    "test": "lerna run test",
+    "test:coverage": "lerna run test:coverage",
+    "lint": "lerna run lint",
+    "clean": "lerna run clean"
   },
   "main": "dist/index.js",
   "umd:main": "dist/react-vitae.umd.production.js",
@@ -35,32 +35,34 @@
   },
   "homepage": "https://github.com/minivera/lander#readme",
   "devDependencies": {
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@testing-library/jest-dom": "^4.2.3",
-    "@types/jest": "^24.0.22",
-    "@typescript-eslint/eslint-plugin": "^2.6.1",
-    "@typescript-eslint/parser": "^2.6.1",
-    "eslint": "^6.6.0",
-    "eslint-config-prettier": "^6.5.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-jest": "^23.0.3",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-promise": "^4.1.1",
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@types/jest": "^26.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@typescript-eslint/parser": "^4.4.0",
+    "cross-env": "^7.0.2",
+    "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "jest": "^24.9.0",
-    "parcel": "^2.0.0-alpha.2.1",
-    "prettier": "^1.19.1",
-    "ts-jest": "^24.1.0",
-    "tsdx": "^0.11.0",
-    "typescript": "^3.7.2"
+    "jest": "^26.5.2",
+    "lerna": "^3.22.1",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.1",
+    "tsdx": "^0.14.0",
+    "typescript": "^4.0.3"
   },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }

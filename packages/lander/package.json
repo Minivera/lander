@@ -1,0 +1,40 @@
+{
+  "name": "lander",
+  "version": "0.0.0",
+  "description": "Modern framework for creating portable UI components and applications",
+  "keywords": [
+    "virtual-dom",
+    "javascript",
+    "framework",
+    "web",
+    "components"
+  ],
+  "author": "guillaume <guillaume@codecov.io>",
+  "homepage": "https://github.com/minivera/lander/tree/master/packages/lander#readme",
+  "license": "ISC",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production tsdx build",
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
+    "prepublishOnly": "npm run build",
+    "test": "tsdx test --env=jsdom",
+    "test:coverage": "tsdx test --env=jsdom --coverage",
+    "clean": "git clean -fdX ."
+  },
+  "main": "dist/index.js",
+  "module": "dist/lander.esm.js",
+  "browser": "dist/lander.esm.js",
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Minivera/lander.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Minivera/lander/issues"
+  }
+}
