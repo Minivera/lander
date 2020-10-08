@@ -1,0 +1,47 @@
+{
+  "name": "blueprint",
+  "version": "0.0.0",
+  "description": "Lightweight renderer and testing library for lander components and applications",
+  "keywords": [
+    "testing",
+    "virtual-dom",
+    "lander",
+    "javascript"
+  ],
+  "author": "guillaume <guillaume@codecov.io>",
+  "homepage": "https://github.com/minivera/lander/tree/master/packages/blueprint#readme",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "module": "dist/blueprint.esm.js",
+  "browser": "dist/blueprint.esm.js",
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Minivera/lander.git"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production tsdx build --target=node",
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
+    "prepublishOnly": "npm run build",
+    "test": "tsdx test --env=jest-environment-jsdom-sixteen",
+    "test:coverage": "tsdx test --env=jest-environment-jsdom-sixteen --coverage",
+    "clean": "git clean -fdX ."
+  },
+  "bugs": {
+    "url": "https://github.com/Minivera/lander/issues"
+  },
+  "devDependencies": {
+    "lander": "^0.0.0"
+  },
+  "peerDependencies": {
+    "lander": "*"
+  },
+  "dependencies": {
+  }
+}

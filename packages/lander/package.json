@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Modern framework for creating portable UI components and applications",
   "keywords": [
+    "lander",
     "virtual-dom",
     "javascript",
     "framework",

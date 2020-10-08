@@ -3,7 +3,7 @@ import { TextNode } from './textNode';
 import { HtmlNode } from './htmlNode';
 import { flatten } from '../utils/flattenArray';
 
-import { VirtualElement, VirtualNode, Tag, Props } from '../types/lander';
+import { VirtualElement, VirtualNode, Tag, Props, AugmentedFunctionComponent } from '../types/lander';
 
 type DefinedVirtualElement = VirtualNode | string | number | boolean;
 
@@ -60,8 +60,9 @@ export const createNode = (tag: Tag, attributes: Props = {}, ...children: Virtua
     const flatChildren = flatten(children) as DefinedVirtualElement[];
     if (typeof tag === 'function') {
         // Clone the tag so components do not share context
-        const cloned = tag.bind({});
+        const cloned = tag.bind({}) as AugmentedFunctionComponent;
         Object.assign(cloned, tag);
+        cloned.original = tag;
 
         return new TreeNode({
             factory: cloned,

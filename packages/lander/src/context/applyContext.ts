@@ -1,4 +1,4 @@
-import { FunctionComponent, ContextObject } from '../types/lander';
+import { ContextObject, AugmentedFunctionComponent } from '../types/lander';
 
 /**
  * Function that augments the received component to add the functionalities to basic function components.
@@ -6,10 +6,13 @@ import { FunctionComponent, ContextObject } from '../types/lander';
  * on the component for as long as it is loaded into the DOM.
  * @param {ContextObject} contextCreator - function that returns an object containing the context to apply
  * on the component.
- * @param {FunctionComponent} component - Component on which to add the context.
- * @return {FunctionComponent} Augmented component with context added.
+ * @param {AugmentedFunctionComponent} component - Component on which to add the context.
+ * @return {AugmentedFunctionComponent} Augmented component with context added.
  */
-export const applyContext = (contextCreator: () => ContextObject, component: FunctionComponent): FunctionComponent => {
+export const applyContext = (
+    contextCreator: () => ContextObject,
+    component: AugmentedFunctionComponent
+): AugmentedFunctionComponent => {
     // Temporarily add the context object to the factory so we can build it later.
     if (!component.contextObjects) {
         component.contextObjects = [];
@@ -24,10 +27,10 @@ export const applyContext = (contextCreator: () => ContextObject, component: Fun
  * Function that applies the saved context objects on a component. The context objects
  * need to be saved on the function before getting applied to make sure we clone the data and
  * that no component share their contexts.
- * @param {FunctionComponent} component - Component on which to add the context.
- * @return {FunctionComponent} Augmented component with context added.
+ * @param {AugmentedFunctionComponent} component - Component on which to add the context.
+ * @return {AugmentedFunctionComponent} Augmented component with context added.
  */
-export const applyContextToFactory = (component: FunctionComponent): FunctionComponent => {
+export const applyContextToFactory = (component: AugmentedFunctionComponent): AugmentedFunctionComponent => {
     if (!component.contextObjects) {
         return component;
     }
