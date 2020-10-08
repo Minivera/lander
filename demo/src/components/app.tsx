@@ -17,7 +17,7 @@ interface Context {
     nowShowing: TodoState;
 }
 
-export const App: FunctionComponent<unknown, Context> = (
+export const App: FunctionComponent<undefined, Context> = (
     _,
     { todos = [], newTodo = '', nowShowing = TodoState.ALL_TODOS, setState }
 ): VirtualElement => {

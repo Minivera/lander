@@ -1,5 +1,5 @@
 import { patch } from '../diffing/patchRecursive';
-import { Props, VirtualNode, Context, FunctionComponent, LifecycleListeners, TreeNode } from '../types/lander';
+import { Props, VirtualNode, Context, AugmentedFunctionComponent, LifecycleListeners, TreeNode } from '../types/lander';
 import { vnodizeChildren } from '../nodes/factory';
 
 /**
@@ -32,9 +32,9 @@ export class ComponentElement extends window.HTMLElement {
 
     /**
      * The factory to execute when this component mounts or update.
-     * @type {FunctionComponent}
+     * @type {AugmentedFunctionComponent}
      */
-    private factory: FunctionComponent | null = null;
+    private factory: AugmentedFunctionComponent | null = null;
 
     /**
      * The context is a special function that takes in a context object and will return a context object. By executing
@@ -91,12 +91,17 @@ export class ComponentElement extends window.HTMLElement {
 
     /**
      * Update the values of the DOM component from the values passed in parameter.
-     * @param {FunctionComponent} factory - Function to render the component.
+     * @param {AugmentedFunctionComponent} factory - Function to render the component.
      * @param {Props} props - Properties to give to the factory.
      * @param {VirtualNode} virtualChild - Child to give to the factory.
      * @param {TreeNode} node - Underlying virtual node backing the DOM node.
      */
-    public setAll(factory: FunctionComponent, props: Props, virtualChild: VirtualNode[] | null, node: TreeNode): void {
+    public setAll(
+        factory: AugmentedFunctionComponent,
+        props: Props,
+        virtualChild: VirtualNode[] | null,
+        node: TreeNode
+    ): void {
         this.factory = factory;
         this.contextCreator = this.factory.contextCreator || ((context: Context) => context);
         this.props = props;
@@ -239,5 +244,13 @@ export class ComponentElement extends window.HTMLElement {
         }
 
         return vnodizeChildren(result);
+    }
+
+    /**
+     * Returns the component's factory function.
+     * @return {AugmentedFunctionComponent} The function used to render this element.
+     */
+    public getFactory(): AugmentedFunctionComponent | null {
+        return this.factory;
     }
 }

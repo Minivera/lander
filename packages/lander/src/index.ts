@@ -12,7 +12,7 @@ window.customElements.define('vdom-component', ComponentElement);
  * multiple times on different components, there is no limit to the amount of virtual trees in a single page.
  *
  * @example
- * new Lander.renderInto(App, "#app");
+ * Lander.renderInto(App, "#app");
  * @export
  */
 export const Lander = {
@@ -35,4 +35,4 @@ export const Lander = {
     },
 };
 
-export { createNode as h, applyContext };
+export { createNode as h, applyContext, ComponentElement };

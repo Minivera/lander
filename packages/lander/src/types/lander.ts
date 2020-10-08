@@ -3,9 +3,9 @@ import { TreeNode } from '../nodes/treeNode';
 import { TextNode } from '../nodes/textNode';
 import { HtmlNode } from '../nodes/htmlNode';
 
-export type Props<T = Record<string, unknown>> = {
-    [s: string]: unknown;
-} & T;
+export type Props<T = Record<string, unknown>> = T & {
+    children?: VirtualNode[];
+};
 
 export type Context<T = Record<string, unknown>> = {
     setState: (key: string, value: unknown) => void;
@@ -55,22 +55,22 @@ export interface ContextObject extends LifecycleListeners {
 }
 
 /**
+ * Type to define a function that will produce a component when executed with properties and context.
  * @callback FunctionComponent
  * @param {Props} props - The properties and children of this component.
  * @param {Context} context - The state and function to set the state for this component.
- * @property {function(Context): Context} contextCreator - Function that is to be executed when applying the
- * context on a component.
- * @property {ContextObject[]} contextObjects - Array of objects that are applied to the context. Those are only set
- * when the component is first created through the factory.
- * @returns {VirtualNode}
+ * @returns {VirtualElement} Returns a virtual element, created after executing the function component.
  */
-export type FunctionComponent<P = Record<string, unknown>, C = Record<string, unknown>> = ((
-    props: Props<P>,
-    context: Context<C>
-) => VirtualElement) & {
+// eslint-disable-next-line
+export interface FunctionComponent<P = {}, C = {}> {
+    (props?: Props<P>, context?: Context<C>): VirtualElement;
+}
+
+export interface AugmentedFunctionComponent extends FunctionComponent {
     contextCreator?: (context: Context) => Context;
     contextObjects?: (() => ContextObject)[];
-};
+    original?: (props: Props, context: Context) => VirtualElement;
+}
 
 export type Tag = string | number | boolean | FunctionComponent | { text: string | number | boolean };
 

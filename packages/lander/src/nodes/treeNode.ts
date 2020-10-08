@@ -1,5 +1,5 @@
 import { applyContextToFactory } from '../context/applyContext';
-import { FunctionComponent, Props, VirtualNode } from '../types/lander';
+import { AugmentedFunctionComponent, Props, VirtualNode } from '../types/lander';
 import { ComponentElement } from '../tree/component';
 
 /**
@@ -10,10 +10,10 @@ import { ComponentElement } from '../tree/component';
  */
 export class TreeNode {
     /**
-     * Stores the factory used to render this component.
-     * @type {FunctionComponent}
+     * Stores the factory used to render this component, augmented with context.
+     * @type {AugmentedFunctionComponent}
      */
-    public factory: FunctionComponent;
+    public factory: AugmentedFunctionComponent;
 
     /**
      * The attributes assigned to this node, will be passed to the factory when it is executed.
@@ -37,7 +37,7 @@ export class TreeNode {
     /**
      * Class constructor that stores the values.
      * @param {Object} props - The properties given to this constructor.
-     * @param {FunctionComponent} props.factory - Component to build when this node is rendered in the view.
+     * @param {AugmentedFunctionComponent} props.factory - Component to build when this node is rendered in the view.
      * @param {object} props.attributes - Attributes to pass to the factory when called.
      * @param {VirtualNode[]} props.children - The children to pass to the factory when called.
      */
@@ -46,7 +46,7 @@ export class TreeNode {
         attributes,
         children,
     }: {
-        factory: FunctionComponent;
+        factory: AugmentedFunctionComponent;
         attributes: Props;
         children: VirtualNode[];
     }) {
