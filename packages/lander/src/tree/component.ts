@@ -123,7 +123,7 @@ export class ComponentElement extends window.HTMLElement {
      * The lifecycle method called by the DOM with the component is disconnected from it.
      */
     public disconnectedCallback(): void {
-        this.lifecycleListeners.beforeDisconnect.call(this, this.context);
+        this.lifecycleListeners.beforeDisconnect?.call(this, this.context);
         this.mounted = false;
     }
 
@@ -181,10 +181,10 @@ export class ComponentElement extends window.HTMLElement {
         }
 
         this.tree = this.render();
-        this.lifecycleListeners.beforeMount.call(this, this.context);
+        this.lifecycleListeners.beforeMount?.call(this, this.context);
         patch(this.node, null, this.tree);
         this.mounted = true;
-        this.lifecycleListeners.afterMount.call(this, this.context);
+        this.lifecycleListeners.afterMount?.call(this, this.context);
     }
 
     /**
@@ -212,13 +212,13 @@ export class ComponentElement extends window.HTMLElement {
             return;
         }
 
-        this.lifecycleListeners.beforeUpdate.call(this, this.context);
-        if (!this.lifecycleListeners.shouldUpdate.call(this, this.context)) {
+        this.lifecycleListeners.beforeUpdate?.call(this, this.context);
+        if (!this.lifecycleListeners.shouldUpdate?.call(this, this.context)) {
             return;
         }
         const vtree = this.render();
         patch(this.node, this.tree, vtree);
-        this.lifecycleListeners.afterUpdate.call(this, this.context);
+        this.lifecycleListeners.afterUpdate?.call(this, this.context);
     }
 
     /**

@@ -7,10 +7,13 @@ export type Props<T = Record<string, unknown>> = T & {
     children?: VirtualNode[];
 };
 
+export type PropsWithChildren<T = Record<string, unknown>> = Props<T> & {
+    children: VirtualNode[];
+};
+
 export type Context<T = Record<string, unknown>> = {
     setState: (key: string, value: unknown) => void;
     requestUpdate: () => void;
-    [s: string]: unknown;
 } & T;
 
 export type VirtualNode = TreeNode | TextNode | HtmlNode;
@@ -34,12 +37,12 @@ export type VirtualElement = VirtualNode | string | number | boolean | null | un
  * from the DOM.
  */
 export interface LifecycleListeners {
-    beforeMount: (instance: Context) => void;
-    afterMount: (instance: Context) => void;
-    beforeUpdate: (instance: Context) => void;
-    shouldUpdate: (instance: Context) => void | boolean;
-    afterUpdate: (instance: Context) => void;
-    beforeDisconnect: (instance: Context) => void;
+    beforeMount?: (instance: Context) => void;
+    afterMount?: (instance: Context) => void;
+    beforeUpdate?: (instance: Context) => void;
+    shouldUpdate?: (instance: Context) => void | boolean;
+    afterUpdate?: (instance: Context) => void;
+    beforeDisconnect?: (instance: Context) => void;
 }
 
 /**
@@ -63,16 +66,16 @@ export interface ContextObject extends LifecycleListeners {
  */
 // eslint-disable-next-line
 export interface FunctionComponent<P = {}, C = {}> {
-    (props?: Props<P>, context?: Context<C>): VirtualElement;
+    (props: PropsWithChildren<P>, context: Context<C>): VirtualElement;
 }
 
-export interface AugmentedFunctionComponent extends FunctionComponent {
+export interface AugmentedFunctionComponent extends FunctionComponent<never, never> {
     contextCreator?: (context: Context) => Context;
     contextObjects?: (() => ContextObject)[];
-    original?: (props: Props, context: Context) => VirtualElement;
+    original?: (props: Props<never>, context: Context<never>) => VirtualElement;
 }
 
-export type Tag = string | number | boolean | FunctionComponent | { text: string | number | boolean };
+export type Tag = string | number | boolean | FunctionComponent<never, never> | { text: string | number | boolean };
 
 export { TreeNode, TextNode, HtmlNode };
 

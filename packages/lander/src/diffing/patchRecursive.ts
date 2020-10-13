@@ -2,7 +2,7 @@ import { HtmlNode } from '../nodes/htmlNode';
 import { TreeNode } from '../nodes/treeNode';
 import { applyAttributes, updateNode, generateNode } from './utils';
 
-import { VirtualNode } from '../types/lander';
+import { TextNode, VirtualNode } from '../types/lander';
 
 /**
  * Main diffing algorithm that will diff nodes and patch them in place, generating DOM mutations alongside virtual DOM
@@ -47,7 +47,7 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
     // If the two nodes don't have the same type
     if (oldNode.constructor !== newNode.constructor) {
         // Replace the old child with the new child
-        if (Object.prototype.hasOwnProperty.call(newNode, 'children')) {
+        if (Object.prototype.hasOwnProperty.call(parent, 'children')) {
             const converted = parent as { children: VirtualNode[] };
 
             converted.children = converted.children.map(child => {
@@ -72,6 +72,36 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
         }
 
         parent.domNode.replaceChild(domNode, oldNode.domNode);
+
+        // Setup to make sure we patch the children as well
+        if (newNode instanceof TextNode) {
+            return;
+        }
+        const convertedNew = newNode as TreeNode | HtmlNode;
+
+        // Loop in the new children if there are more
+        convertedNew.children.forEach(child => {
+            // Generate the new node and append it to the dom
+            const domNode = generateNode(child);
+            if (!domNode || !convertedNew.domNode) {
+                return;
+            }
+
+            child.domNode = domNode;
+            if (child instanceof HtmlNode) {
+                applyAttributes({}, child.attributes, domNode as HTMLElement);
+            }
+
+            // Start patching the new node's children
+            if (Object.prototype.hasOwnProperty.call(child, 'children')) {
+                const converted = child as { children: VirtualNode[] };
+
+                converted.children.forEach(child => patch(child, null, child));
+            }
+
+            convertedNew.domNode.appendChild(domNode);
+        });
+        return;
     } else if (!oldNode.diff(newNode)) {
         if (!oldNode.domNode) {
             return;
@@ -88,7 +118,7 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
     }
 
     // Make sure to not check children for text nodes
-    if (!Object.prototype.hasOwnProperty.call(oldNode, 'children')) {
+    if (oldNode instanceof TextNode) {
         return;
     }
     const convertedOld = oldNode as HtmlNode | TreeNode;
