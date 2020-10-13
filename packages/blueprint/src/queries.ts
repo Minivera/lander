@@ -1,4 +1,4 @@
-import { FunctionComponent, ComponentElement } from 'lander';
+import { FunctionComponent, ComponentElement } from '@lander/lander';
 
 export interface Queries {
     findComponent: (factory: FunctionComponent) => ComponentElement | undefined;

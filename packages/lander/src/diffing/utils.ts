@@ -70,12 +70,10 @@ export const generateNode = (virtualNode: VirtualNode): HTMLElement | Text | Com
         return document.createElement(virtualNode.tag);
     } else if (virtualNode instanceof TextNode) {
         return document.createTextNode(virtualNode.text);
-    } else if (virtualNode instanceof TreeNode) {
-        const rootElement = document.createElement('vdom-component') as ComponentElement;
-        rootElement.setAll(virtualNode.factory, virtualNode.attributes, virtualNode.children, virtualNode);
-        return rootElement;
     }
-    return undefined;
+    const rootElement = document.createElement('vdom-component') as ComponentElement;
+    rootElement.setAll(virtualNode.factory, virtualNode.attributes, virtualNode.children, virtualNode);
+    return rootElement;
 };
 
 /**
@@ -104,7 +102,7 @@ export const updateNode = (oldNode: VirtualNode, newNode: VirtualNode): void => 
 
         convertedOld.text = convertedNew.text;
         convertedOld.domNode.nodeValue = convertedNew.text;
-    } else if (oldNode instanceof TreeNode) {
+    } else {
         const convertedOld = oldNode as TreeNode;
         const convertedNew = newNode as TreeNode;
 

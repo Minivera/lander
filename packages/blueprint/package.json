@@ -1,5 +1,5 @@
 {
-  "name": "blueprint",
+  "name": "@lander/blueprint",
   "version": "0.0.0",
   "description": "Lightweight renderer and testing library for lander components and applications",
   "keywords": [
@@ -37,11 +37,9 @@
     "url": "https://github.com/Minivera/lander/issues"
   },
   "devDependencies": {
-    "lander": "^0.0.0"
+    "@lander/lander": "^0.0.0"
   },
   "peerDependencies": {
-    "lander": "*"
-  },
-  "dependencies": {
+    "@lander/lander": "*"
   }
 }

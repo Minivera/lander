@@ -1,39 +1,23 @@
 {
-  "name": "lander",
+  "name": "@lander/lander-monorepo",
   "version": "0.0.1",
   "description": "A VDOM engine made for the modern web",
-  "browser": "dist/lander.browser.js",
+  "private": true,
   "scripts": {
     "publish": "lerna publish",
-    "start": "lerna run start --loglevel debug",
+    "build": "lerna run build",
     "postinstall": "lerna bootstrap --no-ci",
     "test": "lerna run test",
     "test:coverage": "lerna run test:coverage",
     "lint": "lerna run lint",
     "clean": "lerna run clean"
   },
-  "main": "dist/index.js",
-  "umd:main": "dist/react-vitae.umd.production.js",
-  "module": "dist/react-vitae.es.production.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist/"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/minivera/lander.git"
   },
-  "keywords": [
-    "virtual",
-    "dom",
-    "light"
-  ],
   "author": "Minivera",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/minivera/lander/issues"
-  },
-  "homepage": "https://github.com/minivera/lander#readme",
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-transform-runtime": "^7.11.5",

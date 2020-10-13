@@ -1,4 +1,4 @@
-import { Props, FunctionComponent, TreeNode, VirtualNode, ComponentElement } from 'lander';
+import { Props, FunctionComponent, TreeNode, VirtualNode, ComponentElement } from '@lander/lander';
 
 import { Queries, findComponent, findAllComponents } from './queries';
 

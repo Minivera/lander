@@ -1,4 +1,4 @@
-import { h } from 'lander';
+import { h } from '@lander/lander';
 
 import { mount } from './index';
 
