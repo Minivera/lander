@@ -241,6 +241,8 @@ describe('Render multiple components', () => {
 
         await new Promise(window.requestAnimationFrame);
 
-        expect(container.innerHTML).toEqual('<vdom-component><main><vdom-component><marquee>loaded!</marquee></vdom-component></main></vdom-component>');
+        expect(container.innerHTML).toEqual(
+            '<vdom-component><main><vdom-component><marquee>loaded!</marquee></vdom-component></main></vdom-component>'
+        );
     });
 });

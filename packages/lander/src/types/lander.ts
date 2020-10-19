@@ -69,10 +69,10 @@ export interface FunctionComponent<P = {}, C = {}> {
     (props: PropsWithChildren<P>, context: Context<C>): VirtualElement;
 }
 
-export interface AugmentedFunctionComponent extends FunctionComponent<never, never> {
+export interface AugmentedFunctionComponent extends FunctionComponent {
     contextCreator?: (context: Context) => Context;
     contextObjects?: (() => ContextObject)[];
-    original?: (props: Props<never>, context: Context<never>) => VirtualElement;
+    original?: (props: PropsWithChildren<never>, context: Context<never>) => VirtualElement;
 }
 
 export type Tag = string | number | boolean | FunctionComponent<never, never> | { text: string | number | boolean };
