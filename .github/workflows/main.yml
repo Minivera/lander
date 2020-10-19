@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-   runs-on: ubunty-latest
+   runs-on: ubuntu-latest
    steps:
      - uses: actions/checkout@v2
      - name: Set-up NodeJS
