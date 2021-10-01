@@ -20,6 +20,7 @@ type DefinedVirtualElement = VirtualNode | string | number | boolean;
  */
 export const vnodizeChildren = (child: DefinedVirtualElement): VirtualNode =>
     typeof child === 'string' || typeof child === 'number' || typeof child === 'boolean'
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         ? createNode({ text: child }, {})
         : child;
 
@@ -50,7 +51,7 @@ export const createNode = (tag: Tag, attributes: Props = {}, ...children: Virtua
 
     // Remove attributes added by JSX in development
     if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { __self, __source, ...rest } = props;
         props = rest;
     }
