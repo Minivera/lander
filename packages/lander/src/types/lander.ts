@@ -1,19 +1,36 @@
-/* eslint-disable no-use-before-define,no-unused-vars,@typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any,@typescript-eslint/no-namespace */
+/* eslint-disable no-use-before-define,no-unused-vars,@typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any,@typescript-eslint/no-namespace,@typescript-eslint/ban-types */
 import { TreeNode } from '../nodes/treeNode';
 import { TextNode } from '../nodes/textNode';
 import { HtmlNode } from '../nodes/htmlNode';
 
-export type Props<T = Record<string, unknown>> = T & {
+export type Props<T = {}, C = {}> = T & {
     children?: VirtualNode[];
+    context: Context<C>;
 };
 
-export type PropsWithChildren<T = Record<string, unknown>> = Props<T> & {
+export type PropsWithChildren<T = {}, C = {}> = Props<T, C> & {
     children: VirtualNode[];
 };
 
-export type Context<T = Record<string, unknown>> = {
-    setState: (key: string, value: unknown) => void;
+export type PropsWithoutContext<T = {}, C = {}> = T & {
+    children?: VirtualNode[];
+    context?: Context<C>;
+};
+
+export interface LifecycleListenersSetters {
+    beforeMount: (listener: (instance: Context) => void) => void;
+    afterMount: (listener: (instance: Context) => void) => void;
+    beforeUpdate: (listener: (instance: Context) => void) => void;
+    shouldUpdate: (listener: (instance: Context) => void | boolean) => void;
+    afterUpdate: (listener: (instance: Context) => void) => void;
+    beforeDisconnect: (listener: (instance: Context) => void) => void;
+}
+
+export type Context<T = {}> = {
     requestUpdate: () => void;
+    inject: <I = {}>(
+        contextInjector: ((context: Context<T>, listeners: LifecycleListenersSetters) => I) | I
+    ) => Context<T & I>;
 } & T;
 
 export type VirtualNode = TreeNode | TextNode | HtmlNode;
@@ -46,34 +63,27 @@ export interface LifecycleListeners {
 }
 
 /**
- * Object used to store and apply context on components. Context is a data store that can hook into lifecycle methods
- * of components and provide data that will then be passed to the factory.
- * @typedef ContextObject
- * @property {function(Object): Object} apply - Apply function that will be executed when context is
- * generated. It receives the previous context and updates it with the new context. Apply functions will be
- * chained together to generate the final context object.
- */
-export interface ContextObject extends LifecycleListeners {
-    apply: (current: Context) => Context;
-}
-
-/**
  * Type to define a function that will produce a component when executed with properties and context.
  * @callback FunctionComponent
  * @param {Props} props - The properties and children of this component.
  * @param {Context} context - The state and function to set the state for this component.
  * @returns {VirtualElement} Returns a virtual element, created after executing the function component.
  */
-// eslint-disable-next-line
 export interface FunctionComponent<P = {}, C = {}> {
-    (props: PropsWithChildren<P>, context: Context<C>): VirtualElement;
+    (props: PropsWithChildren<P, C>): VirtualElement;
 }
 
-export interface AugmentedFunctionComponent extends FunctionComponent {
-    contextCreator?: (context: Context) => Context;
-    contextObjects?: (() => ContextObject)[];
-    original?: (props: PropsWithChildren<never>, context: Context<never>) => VirtualElement;
+export interface JSXContext {
+    requestUpdate: () => void;
+    inject: (contextInjector: ((context: JSXContext, listeners: LifecycleListenersSetters) => {}) | {}) => JSXContext;
 }
+
+export interface JSXProps extends Record<string, unknown> {
+    children?: VirtualNode[];
+    context?: JSXContext;
+}
+
+export type JSXFunctionComponent = (props: JSXProps) => VirtualElement;
 
 export type Tag = string | number | boolean | FunctionComponent<never, never> | { text: string | number | boolean };
 

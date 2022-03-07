@@ -1,5 +1,4 @@
-import { applyContextToFactory } from '../context/applyContext';
-import { AugmentedFunctionComponent, Props, VirtualNode } from '../types/lander';
+import { JSXFunctionComponent, JSXProps, VirtualNode } from '../types/lander';
 import { ComponentElement } from '../tree/component';
 
 /**
@@ -11,15 +10,15 @@ import { ComponentElement } from '../tree/component';
 export class TreeNode {
     /**
      * Stores the factory used to render this component, augmented with context.
-     * @type {AugmentedFunctionComponent}
+     * @type {JSXFunctionComponent}
      */
-    public factory: AugmentedFunctionComponent;
+    public factory: JSXFunctionComponent;
 
     /**
      * The attributes assigned to this node, will be passed to the factory when it is executed.
-     * @type {Props}
+     * @type {JSXProps}
      */
-    public attributes: Props;
+    public attributes: JSXProps;
 
     /**
      * Children of the node. Will be passed to the factory when it is execute. Not to confuse with the children
@@ -36,9 +35,9 @@ export class TreeNode {
 
     /**
      * Class constructor that stores the values.
-     * @param {Object} props - The properties given to this constructor.
-     * @param {AugmentedFunctionComponent} props.factory - Component to build when this node is rendered in the view.
-     * @param {object} props.attributes - Attributes to pass to the factory when called.
+     * @param {object} props - The properties given to this constructor.
+     * @param {JSXFunctionComponent} props.factory - Component to build when this node is rendered in the view.
+     * @param {JSXProps} props.attributes - Attributes to pass to the factory when called.
      * @param {VirtualNode[]} props.children - The children to pass to the factory when called.
      */
     constructor({
@@ -46,11 +45,11 @@ export class TreeNode {
         attributes,
         children,
     }: {
-        factory: AugmentedFunctionComponent;
-        attributes: Props;
+        factory: JSXFunctionComponent;
+        attributes: JSXProps;
         children: VirtualNode[];
     }) {
-        this.factory = applyContextToFactory(factory);
+        this.factory = factory;
         this.attributes = attributes;
         this.children = children;
     }
@@ -64,7 +63,11 @@ export class TreeNode {
         if (!(other instanceof TreeNode)) {
             return false;
         }
-        if (Object.entries(this.attributes).find(([key, value]) => other.attributes[key] !== value)) {
+        if (
+            Object.entries(this.attributes).find(
+                ([key, value]) => (other.attributes as Record<string, unknown>)[key] !== value
+            )
+        ) {
             return false;
         }
         return this.factory === other.factory;

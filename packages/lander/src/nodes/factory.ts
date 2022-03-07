@@ -1,14 +1,11 @@
 import { TreeNode } from './treeNode';
 import { TextNode } from './textNode';
 import { HtmlNode } from './htmlNode';
-import { flatten } from '../utils/flattenArray';
 
-import { VirtualElement, VirtualNode, Tag, Props, AugmentedFunctionComponent } from '../types/lander';
-
-type DefinedVirtualElement = VirtualNode | string | number | boolean;
+import { VirtualElement, VirtualNode, Tag, JSXProps, JSXFunctionComponent } from '../types/lander';
 
 /**
- * Transform all children that are not object readable bu the `createNode` function into an object
+ * Transform all children that are not object readable by the `createNode` function into an object
  * that can ve processed by that same function. In particular, it makes sure that you can pass a string as
  * a children and still get a valid node.
  *
@@ -18,10 +15,10 @@ type DefinedVirtualElement = VirtualNode | string | number | boolean;
  * @param child {VirtualElement} - The children the manage. This function is intended to be called within a `.map` call.
  * @returns {VirtualNode} Returns a valid virtual node.
  */
-export const vnodizeChildren = (child: DefinedVirtualElement): VirtualNode =>
+export const vnodizeChildren = (child: VirtualElement): VirtualNode | null | undefined =>
     typeof child === 'string' || typeof child === 'number' || typeof child === 'boolean'
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        ? createNode({ text: child }, {})
+        ? // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          createNode({ text: child }, {})
         : child;
 
 /**
@@ -45,30 +42,28 @@ export const vnodizeChildren = (child: DefinedVirtualElement): VirtualNode =>
  * @returns {VirtualNode} Returns a valid virtual node.
  * @export
  */
-export const createNode = (tag: Tag, attributes: Props = {}, ...children: VirtualElement[]): VirtualNode => {
+export const createNode = (
+    tag: Tag,
+    attributes: JSXProps = {},
+    ...children: VirtualElement[]
+): VirtualNode => {
     // protect against null attributes
     let props = attributes || {};
 
     // Remove attributes added by JSX in development
     if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { __self, __source, ...rest } = props;
-        props = rest;
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        const { __self, __source, ...rest } = props as { __self: never, __source: never};
+        props = rest as JSXProps;
     }
 
     // Flatten the children so that any array created with things like .map are processed as a single continuous array.
-    // TODO: This might be inefficient long term.
-    const flatChildren = flatten(children) as DefinedVirtualElement[];
+    const flatChildren = children.flat();
     if (typeof tag === 'function') {
-        // Clone the tag so components do not share context
-        const cloned = tag.bind({}) as AugmentedFunctionComponent;
-        Object.assign(cloned, tag);
-        cloned.original = tag;
-
         return new TreeNode({
-            factory: cloned,
+            factory: tag as JSXFunctionComponent,
             attributes: props,
-            children: flatChildren.map(vnodizeChildren),
+            children: flatChildren.map(vnodizeChildren).filter(child => child),
         });
     }
     if (Object.prototype.hasOwnProperty.call(tag, 'text')) {
@@ -78,6 +73,6 @@ export const createNode = (tag: Tag, attributes: Props = {}, ...children: Virtua
     return new HtmlNode({
         tag: tag as string,
         attributes: props,
-        children: flatChildren.map(vnodizeChildren),
+        children: flatChildren.map(vnodizeChildren).filter(child => child),
     });
 };

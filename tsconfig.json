@@ -19,6 +19,6 @@
     "target": "ESNext",
     "types": ["node", "jest"]
   },
-  "include": ["packages/**/*", "**/*.spec.ts"],
+  "include": ["packages/**/*", "demo/**/*", "**/*.spec.ts"],
   "exclude": ["node_modules", "dist"]
 }

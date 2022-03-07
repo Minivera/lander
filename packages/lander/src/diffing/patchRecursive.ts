@@ -1,20 +1,27 @@
 import { HtmlNode } from '../nodes/htmlNode';
 import { TreeNode } from '../nodes/treeNode';
-import { applyAttributes, updateNode, generateNode } from './utils';
-
 import { TextNode, VirtualNode } from '../types/lander';
+
+import { applyAttributes, updateNode, generateNode } from './utils';
+import { DOMPatchScheduler } from './domPatchScheduler';
 
 /**
  * Main diffing algorithm that will diff nodes and patch them in place, generating DOM mutations alongside virtual DOM
  * mutations. Will be recursively called on all the nodes in the tree until the entire tree has been patched.
  * @todo Improve performance
+ * @param {DOMPatchScheduler} scheduler - The DOM scheduler used to plan writes so we run them all at once and optimize that for the browser.
  * @param {VirtualNode} parent - The parent of the old and new node. Used to add or remove children.
  * @param {VirtualNode} oldNode - The node from the tree that is being patched. Is modified by the
  * algorithm.
  * @param {VirtualNode} newNode - The node from the new tree used to patch the old tree.
  * @export
  */
-export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode: VirtualNode | null): void => {
+export const patch = (
+    scheduler: DOMPatchScheduler,
+    parent: VirtualNode,
+    oldNode: VirtualNode | null,
+    newNode: VirtualNode | null
+): void => {
     if (!newNode) {
         // If a null or undefined should get here, ignore it.
         return;
@@ -30,14 +37,14 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
 
         newNode.domNode = domNode;
         if (newNode instanceof HtmlNode) {
-            applyAttributes({}, newNode.attributes, domNode as HTMLElement);
+            applyAttributes(scheduler, {}, newNode.attributes, domNode as HTMLElement);
         }
 
         // Start patching on the new node's children
         if (Object.prototype.hasOwnProperty.call(newNode, 'children')) {
             const converted = newNode as { children: VirtualNode[] };
 
-            converted.children.forEach(child => patch(newNode, null, child));
+            converted.children.forEach(child => patch(scheduler, newNode, null, child));
         }
 
         parent.domNode.appendChild(domNode);
@@ -68,10 +75,16 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
             const convertedOld = oldNode as HtmlNode;
             const convertedNew = newNode as HtmlNode;
 
-            applyAttributes(convertedOld.attributes, convertedNew.attributes, domNode as HTMLElement);
+            applyAttributes(scheduler, convertedOld.attributes, convertedNew.attributes, domNode as HTMLElement);
         }
 
-        parent.domNode.replaceChild(domNode, oldNode.domNode);
+        scheduler.write(() => {
+            if (!oldNode.domNode) {
+                return;
+            }
+
+            parent.domNode?.replaceChild(domNode, oldNode?.domNode);
+        });
 
         // Setup to make sure we patch the children as well
         if (newNode instanceof TextNode) {
@@ -81,6 +94,10 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
 
         // Loop in the new children if there are more
         convertedNew.children.forEach(child => {
+            if (!child) {
+                return;
+            }
+
             // Generate the new node and append it to the dom
             const domNode = generateNode(child);
             if (!domNode || !convertedNew.domNode) {
@@ -89,17 +106,17 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
 
             child.domNode = domNode;
             if (child instanceof HtmlNode) {
-                applyAttributes({}, child.attributes, domNode as HTMLElement);
+                applyAttributes(scheduler, {}, child.attributes, domNode as HTMLElement);
             }
 
             // Start patching the new node's children
             if (Object.prototype.hasOwnProperty.call(child, 'children')) {
                 const converted = child as { children: VirtualNode[] };
 
-                converted.children.forEach(child => patch(child, null, child));
+                converted.children.forEach(child => patch(scheduler, child, null, child));
             }
 
-            convertedNew.domNode.appendChild(domNode);
+            scheduler.write(() => convertedNew.domNode?.appendChild(domNode));
         });
         return;
     } else if (!oldNode.diff(newNode)) {
@@ -108,7 +125,7 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
         }
 
         // If the nodes are different, but of the same type, update the nodes
-        updateNode(oldNode, newNode);
+        updateNode(scheduler, oldNode, newNode);
         if (oldNode instanceof TreeNode) {
             // If this node is a component, stop right here and update the component.
             // The component will take care of patching the children
@@ -129,29 +146,49 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
     // Loop in the old children until we have no more children
     for (; index < convertedOld.children.length; index++) {
         const oldChild = convertedOld.children[index];
+        if (!oldChild) {
+            continue;
+        }
 
         // If there are no more new children
         if (index >= convertedNew.children.length) {
             // We have to remove the remaining old children and break the loop
             convertedOld.children.splice(index).forEach(child => {
+                if (!child) {
+                    return;
+                }
+
                 if (!convertedOld.domNode || !child.domNode) {
                     return;
                 }
 
-                convertedOld.domNode.removeChild(child.domNode);
+                scheduler.write(() => {
+                    if (!child.domNode) {
+                        return;
+                    }
+
+                    convertedOld.domNode?.removeChild(child.domNode);
+                });
             });
             break;
         }
 
         const newChild = convertedNew.children[index];
+        if (!newChild) {
+            continue;
+        }
 
         // Start patching the two nodes
-        patch(convertedOld, oldChild, newChild);
+        patch(scheduler, convertedOld, oldChild, newChild);
     }
 
     // Loop in the new children if there are more
     for (; index < convertedNew.children.length; index++) {
         const newChild = convertedNew.children[index];
+        if (!newChild) {
+            continue;
+        }
+
         convertedOld.children.push(newChild);
 
         // Generate the new node and append it to the dom
@@ -162,16 +199,16 @@ export const patch = (parent: VirtualNode, oldNode: VirtualNode | null, newNode:
 
         newChild.domNode = domNode;
         if (newChild instanceof HtmlNode) {
-            applyAttributes({}, newChild.attributes, domNode as HTMLElement);
+            applyAttributes(scheduler, {}, newChild.attributes, domNode as HTMLElement);
         }
 
         // Start patching the new node's children
         if (Object.prototype.hasOwnProperty.call(newChild, 'children')) {
             const converted = newChild as { children: VirtualNode[] };
 
-            converted.children.forEach(child => patch(newChild, null, child));
+            converted.children.forEach(child => patch(scheduler, newChild, null, child));
         }
 
-        convertedOld.domNode.appendChild(domNode);
+        scheduler.write(() => convertedOld.domNode?.appendChild(domNode));
     }
 };

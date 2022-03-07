@@ -1,4 +1,4 @@
-import { Props, VirtualNode } from '../types/lander';
+import { JSXProps, VirtualNode } from '../types/lander';
 
 /**
  * HTML node class that manages an HTML element in the virtual Tree.
@@ -15,9 +15,9 @@ export class HtmlNode {
 
     /**
      * Attributes to assign to the HTMLElement when mounting or updating.
-     * @type {Object}
+     * @type {JSXProps}
      */
-    public attributes: Props;
+    public attributes: JSXProps;
 
     /**
      * Virtual children that will have to be patched into the virtual DOM node when mounting or updating.
@@ -35,10 +35,18 @@ export class HtmlNode {
      * Class constructor that stores the values.
      * @param {Object} props - The properties given to this constructor.
      * @param {String} props.tag - Tag name to create in the DOM when this node is mounted.
-     * @param {Props} props.attributes - Attributes to assign to the HTML node when created.
+     * @param {JSXProps} props.attributes - Attributes to assign to the HTML node when created.
      * @param {VirtualNode[]} props.children - The children to assign to the HTML node when created.
      */
-    constructor({ tag, attributes, children }: { tag: string; attributes: Props; children: VirtualNode[] }) {
+    constructor({
+        tag,
+        attributes,
+        children,
+    }: {
+        tag: string;
+        attributes: JSXProps;
+        children: VirtualNode[];
+    }) {
         this.tag = tag;
         this.attributes = attributes;
         this.children = children;
@@ -56,6 +64,8 @@ export class HtmlNode {
         if (this.tag !== other.tag) {
             return false;
         }
-        return !Object.entries(this.attributes).find(([key, value]) => other.attributes[key] !== value);
+        return !Object.entries(this.attributes).find(
+            ([key, value]) => (other.attributes as Record<string, unknown>)[key] !== value
+        );
     }
 }

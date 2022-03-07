@@ -10,7 +10,7 @@ describe('createNode', () => {
         const result = createNode(factory, props, ...children) as TreeNode;
 
         expect(result).toBeInstanceOf(TreeNode);
-        expect(result.factory.original).toEqual(factory);
+        expect(result.factory).toEqual(factory);
         expect(result.attributes).toEqual(props);
         expect(result.children).toEqual(children);
     });
@@ -53,7 +53,7 @@ describe('createNode', () => {
 
         // First children should be component
         expect(result.children[0]).toBeInstanceOf(TreeNode);
-        expect((result.children[0] as TreeNode).factory.original).toEqual(factory);
+        expect((result.children[0] as TreeNode).factory).toEqual(factory);
 
         // Second children should be text
         expect(result.children[1]).toBeInstanceOf(TextNode);

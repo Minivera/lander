@@ -1,31 +1,41 @@
 import { HtmlNode } from '../nodes/htmlNode';
 import { TextNode } from '../nodes/textNode';
 import { TreeNode } from '../nodes/treeNode';
-
-import { Props, VirtualNode } from '../types/lander';
+import { JSXProps, VirtualNode } from '../types/lander';
 import { ComponentElement } from '../tree/component';
+
+import { DOMPatchScheduler } from './domPatchScheduler';
 
 /**
  * Function that will apply the given attributes on the HTML element. The old attributes are passed for removing
  * attributes when needed. For example, if an attribute is present in the old attributes, but not in the new
  * attributes, it should be removed from the DOM node.
  * @todo support namespaced attributes
- * @param {Props} oldAttributes - The old attributes that were assigned to the node before the patch.
- * @param {Props} newAttributes - The new attributes that were assigned to the node after the patch.
+ * @param {DOMPatchScheduler} scheduler - The DOM scheduler used to plan writes so we run them all at once and optimize that for the browser.
+ * @param {PropsWithoutContext} oldAttributes - The old attributes that were assigned to the node before the patch.
+ * @param {PropsWithoutContext} newAttributes - The new attributes that were assigned to the node after the patch.
  * @param {HTMLElement} node - The node on which to apply the attribute changes.
  */
-export const applyAttributes = (oldAttributes: Props = {}, newAttributes: Props = {}, node: HTMLElement): void => {
+export const applyAttributes = (
+    scheduler: DOMPatchScheduler,
+    oldAttributes: JSXProps = {},
+    newAttributes: JSXProps = {},
+    node: HTMLElement
+): void => {
     Object.keys(oldAttributes).forEach(key => {
         // If the new attributes doesn't have the old attribute
-        if (!Object.prototype.hasOwnProperty.call(newAttributes, key) || !newAttributes[key]) {
-            const objectizedNode = (node as unknown) as { [s: string]: unknown };
+        if (
+            !Object.prototype.hasOwnProperty.call(newAttributes, key) ||
+            !(newAttributes as Record<string, unknown>)[key]
+        ) {
+            const objectizedNode = node as unknown as { [s: string]: unknown };
 
             // Remove the attribute from the node since it is now gone
             if (typeof objectizedNode[key] !== 'undefined') {
                 // Delete on the node directly if we can
                 delete objectizedNode[key];
             }
-            node.removeAttribute(key);
+            scheduler.write(() => node.removeAttribute(key));
         }
     });
     // Go over the new attributes
@@ -33,27 +43,29 @@ export const applyAttributes = (oldAttributes: Props = {}, newAttributes: Props 
         if (
             typeof value !== 'function' &&
             Object.prototype.hasOwnProperty.call(oldAttributes, key) &&
-            oldAttributes[key] === value
+            (oldAttributes as Record<string, unknown>)[key] === value
         ) {
             // If the attribute did not change and is not an event listener, don't bother updating
             return;
         }
-        const objectizedNode = (node as unknown) as { [s: string]: unknown };
+        const objectizedNode = node as unknown as { [s: string]: unknown };
 
         if (typeof objectizedNode[key] !== 'undefined') {
             // Set on the node directly if we can
-            objectizedNode[key] = value;
+            scheduler.write(() => {
+                objectizedNode[key] = value;
+            });
         }
 
         if (typeof value === 'string' || typeof value === 'number') {
             // Set the new attribute value on the node
-            node.setAttribute(key, value.toString());
+            scheduler.write(() => node.setAttribute(key, (value as string | number).toString()));
         } else if (typeof value === 'boolean') {
             // For booleans, set the attribute as an empty string if true or remove if false
             if (value) {
-                node.setAttribute(key, '');
+                scheduler.write(() => node.setAttribute(key, ''));
             } else {
-                node.removeAttribute(key);
+                scheduler.write(() => node.removeAttribute(key));
             }
         }
     });
@@ -71,17 +83,25 @@ export const generateNode = (virtualNode: VirtualNode): HTMLElement | Text | Com
     } else if (virtualNode instanceof TextNode) {
         return document.createTextNode(virtualNode.text);
     }
+    const converted = virtualNode as TreeNode;
+
     const rootElement = document.createElement('vdom-component') as ComponentElement;
-    rootElement.setAll(virtualNode.factory, virtualNode.attributes, virtualNode.children, virtualNode);
+    rootElement.setAll(
+        converted.factory,
+        converted.attributes,
+        converted.children as VirtualNode[],
+        converted
+    );
     return rootElement;
 };
 
 /**
  * Updates a virtual node and its associated DOM node with the values of the new virtual node.
+ * @param {DOMPatchScheduler} scheduler - The DOM scheduler used to plan writes so we run them all at once and optimize that for the browser.
  * @param {VirtualNode} oldNode - The node to update.
  * @param {VirtualNode} newNode - The node to update from.
  */
-export const updateNode = (oldNode: VirtualNode, newNode: VirtualNode): void => {
+export const updateNode = (scheduler: DOMPatchScheduler, oldNode: VirtualNode, newNode: VirtualNode): void => {
     if (oldNode instanceof HtmlNode) {
         const convertedOld = oldNode as HtmlNode;
         const convertedNew = newNode as HtmlNode;
@@ -90,7 +110,7 @@ export const updateNode = (oldNode: VirtualNode, newNode: VirtualNode): void => 
             return;
         }
 
-        applyAttributes(convertedOld.attributes, convertedNew.attributes, convertedOld.domNode);
+        applyAttributes(scheduler, convertedOld.attributes, convertedNew.attributes, convertedOld.domNode);
         oldNode.attributes = convertedNew.attributes;
     } else if (oldNode instanceof TextNode) {
         const convertedOld = oldNode as TextNode;
@@ -116,6 +136,11 @@ export const updateNode = (oldNode: VirtualNode, newNode: VirtualNode): void => 
         convertedOld.factory = convertedNew.factory;
 
         // Update the DOM attributes from the associated web component
-        convertedOld.domNode.setAll(convertedNew.factory, convertedNew.attributes, convertedNew.children, convertedOld);
+        convertedOld.domNode.setAll(
+            convertedNew.factory,
+            convertedNew.attributes,
+            convertedNew.children as VirtualNode[],
+            convertedOld
+        );
     }
 };

@@ -34,12 +34,17 @@ describe('Render a simple component', () => {
     });
 
     it('Will allow the component to be updated', async () => {
-        let stateSetter: (key: string, val: string) => void = () => {};
-        const component: FunctionComponent<unknown, { message: string }> = (
-            _,
-            { message = 'Hello, World!', setState }
-        ) => {
-            stateSetter = setState;
+        let stateSetter: (val: string) => void = () => {};
+        const component: FunctionComponent<unknown, { message: string }> = ({
+            context: { message = 'Hello, World!', inject, requestUpdate },
+        }) => {
+            stateSetter = (val: string) => {
+                inject({
+                    message: val,
+                });
+                requestUpdate();
+            };
+
             return h(
                 'div',
                 {
@@ -52,7 +57,7 @@ describe('Render a simple component', () => {
         };
 
         Lander.renderInto(component, container);
-        stateSetter('message', 'Goodbye, World!');
+        stateSetter('Goodbye, World!');
 
         await new Promise(window.requestAnimationFrame);
 
@@ -62,9 +67,17 @@ describe('Render a simple component', () => {
     });
 
     it('Will handle a list of elements with updates', async () => {
-        let stateSetter: (key: string, val: string[]) => void = () => {};
-        const component: FunctionComponent<unknown, { elements: string[] }> = (_, { elements = [], setState }) => {
-            stateSetter = setState;
+        let stateSetter: (val: string[]) => void = () => {};
+        const component: FunctionComponent<unknown, { elements: string[] }> = ({
+            context: { elements = [], inject, requestUpdate },
+        }) => {
+            stateSetter = (val: string[]) => {
+                inject({
+                    elements: val,
+                });
+                requestUpdate();
+            };
+
             return h(
                 'ul',
                 {
@@ -78,7 +91,7 @@ describe('Render a simple component', () => {
         Lander.renderInto(component, container);
         expect(container.innerHTML).toEqual('<vdom-component><ul id="test" class="test"></ul></vdom-component>');
 
-        stateSetter('elements', ['Hello, World!', 'Goodbye, World!']);
+        stateSetter(['Hello, World!', 'Goodbye, World!']);
 
         await new Promise(window.requestAnimationFrame);
 
@@ -88,12 +101,17 @@ describe('Render a simple component', () => {
     });
 
     it('Will handle a list of elements with removal', async () => {
-        let stateSetter: (key: string, val: string[]) => void = () => {};
-        const component: FunctionComponent<unknown, { elements: string[] }> = (
-            _,
-            { elements = ['Hello, World!', 'Goodbye, World!'], setState }
-        ) => {
-            stateSetter = setState;
+        let stateSetter: (val: string[]) => void = () => {};
+        const component: FunctionComponent<unknown, { elements: string[] }> = ({
+            context: { elements = ['Hello, World!', 'Goodbye, World!'], inject, requestUpdate },
+        }) => {
+            stateSetter = (val: string[]) => {
+                inject({
+                    elements: val,
+                });
+                requestUpdate();
+            };
+
             return h(
                 'ul',
                 {
@@ -105,7 +123,7 @@ describe('Render a simple component', () => {
         };
 
         Lander.renderInto(component, container);
-        stateSetter('elements', []);
+        stateSetter([]);
 
         await new Promise(window.requestAnimationFrame);
 
@@ -113,9 +131,17 @@ describe('Render a simple component', () => {
     });
 
     it('Will handle a complete change in type', async () => {
-        let stateSetter: (key: string, val: boolean) => void = () => {};
-        const component: FunctionComponent<unknown, { loading: boolean }> = (_, { loading = true, setState }) => {
-            stateSetter = setState;
+        let stateSetter: (val: boolean) => void = () => {};
+        const component: FunctionComponent<unknown, { loading: boolean }> = ({
+            context: { loading = true, inject, requestUpdate },
+        }) => {
+            stateSetter = (val: boolean) => {
+                inject({
+                    loading: val,
+                });
+                requestUpdate();
+            };
+
             return h(
                 'div',
                 {
@@ -132,7 +158,7 @@ describe('Render a simple component', () => {
             '<vdom-component><div id="test" loading="" class="test loading">loading</div></vdom-component>'
         );
 
-        stateSetter('loading', false);
+        stateSetter(false);
 
         await new Promise(window.requestAnimationFrame);
 
@@ -206,17 +232,22 @@ describe('Render multiple components', () => {
                 message
             );
 
-        let stateSetter: (key: string, val: string) => void = () => {};
-        const component: FunctionComponent<unknown, { message: string }> = (
-            _,
-            { message = 'Hello, World!', setState }
-        ) => {
-            stateSetter = setState;
+        let stateSetter: (val: string) => void = () => {};
+        const component: FunctionComponent<unknown, { message: string }> = ({
+            context: { message = 'Hello, World!', inject, requestUpdate },
+        }) => {
+            stateSetter = (val: string) => {
+                inject({
+                    message: val,
+                });
+                requestUpdate();
+            };
+
             return h(child, { message });
         };
 
         Lander.renderInto(component, container);
-        stateSetter('message', 'Goodbye, World!');
+        stateSetter('Goodbye, World!');
 
         await new Promise(window.requestAnimationFrame);
 
@@ -228,16 +259,24 @@ describe('Render multiple components', () => {
     it('Will handle a complete change in type', async () => {
         const child: FunctionComponent<{ message: string }> = ({ message }) => h('marquee', {}, message);
 
-        let stateSetter: (key: string, val: boolean) => void = () => {};
-        const component: FunctionComponent<unknown, { loading: boolean }> = (_, { loading = true, setState }) => {
-            stateSetter = setState;
+        let stateSetter: (val: boolean) => void = () => {};
+        const component: FunctionComponent<unknown, { loading: boolean }> = ({
+            context: { loading = true, inject, requestUpdate },
+        }) => {
+            stateSetter = (val: boolean) => {
+                inject({
+                    loading: val,
+                });
+                requestUpdate();
+            };
+
             return h('main', {}, loading ? 'loading' : h(child, { message: 'loaded!' }));
         };
 
         Lander.renderInto(component, container);
         expect(container.innerHTML).toEqual('<vdom-component><main>loading</main></vdom-component>');
 
-        stateSetter('loading', false);
+        stateSetter(false);
 
         await new Promise(window.requestAnimationFrame);
 

@@ -1,8 +1,8 @@
 import { ComponentElement } from './tree/component';
 import { createNode } from './nodes/factory';
 import { TreeNode } from './nodes/treeNode';
-import { applyContext } from './context/applyContext';
-import { AugmentedFunctionComponent, FunctionComponent } from './types/lander';
+import { FunctionComponent, JSXFunctionComponent } from './types/lander';
+
 export * from './types/lander';
 
 window.customElements.define('vdom-component', ComponentElement);
@@ -26,9 +26,13 @@ export const Lander = {
             throw new Error('The root of a virtual DOM tree must be a component');
         }
 
-        const factory = root as AugmentedFunctionComponent;
+        const factory = root as JSXFunctionComponent;
         const rootElement = document.createElement('vdom-component') as ComponentElement;
-        const virtualNode = new TreeNode({ factory, children: [], attributes: {} });
+        const virtualNode = new TreeNode({
+            factory,
+            children: [],
+            attributes: {},
+        });
 
         virtualNode.domNode = rootElement;
         rootElement.setAll(factory, {}, null, virtualNode);
@@ -37,4 +41,4 @@ export const Lander = {
     },
 };
 
-export { createNode as h, applyContext, ComponentElement };
+export { createNode as h, ComponentElement };

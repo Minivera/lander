@@ -14,10 +14,11 @@ interface State {
     editTodo: string;
 }
 
-export const TodoItem: FunctionComponent<Props, State> = (
-    { todo, model },
-    { isEditing = false, editTodo = todo.title, setState }
-): VirtualElement => {
+export const TodoItem: FunctionComponent<Props, State> = ({
+    todo,
+    model,
+    context: { isEditing = false, editTodo = todo.title, setState },
+}): VirtualElement => {
     const setIsEditing = (val: boolean) => setState('isEditing', val);
     const setEditTodo = (val: string) => setState('editTodo', val);
 
