@@ -2,11 +2,11 @@ import type { Config } from '@jest/types';
 
 // Sync object
 const config: Config.InitialOptions = {
-    preset: 'ts-jest/presets/js-with-ts',
+    preset: 'ts-jest',
     transform: {
         '^.+\\.tsx?$': 'ts-jest',
     },
-    testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+    testPathIgnorePatterns: ['/node_modules/'],
     testMatch: [
         '**/__tests__/**/*.[jt]s?(x)',
         '**/?(*.)+(spec|test).[jt]s?(x)',
@@ -15,10 +15,13 @@ const config: Config.InitialOptions = {
     globals: {
         'ts-jest': {
             useESM: true,
+            tsconfig: './tsconfig.json',
         },
     },
-    rootDir: './',
-    modulePaths: ['<rootDir>'],
+    moduleDirectories: ['.', 'node_modules', 'src'],
+    moduleNameMapper: {
+        '@lander/lander(.*)$': '<rootDir>/node_modules/@lander/lander/src/$1'
+    },
     testEnvironment: 'jsdom',
 };
 

@@ -1,4 +1,4 @@
-import { h } from '@lander/lander';
+import { h, JSXFunctionComponent } from '@lander/lander';
 
 import { mount } from './index';
 
@@ -46,8 +46,8 @@ describe('The mount method', () => {
             {
                 ...props,
                 children,
+                context: expect.anything(),
             },
-            expect.anything()
         );
     });
 
@@ -67,11 +67,11 @@ describe('The mount method', () => {
     it('Will allow waiting for updates to the component', async () => {
         const caller = jest.fn();
         let updater = () => {};
-        const FakeComponent = jest.fn((_, { requestUpdate }) => {
+        const FakeComponent = jest.fn(({ context: { requestUpdate } }) => {
             updater = requestUpdate;
             caller();
             return h('div');
-        });
+        }) as unknown as JSXFunctionComponent;
 
         const wrapper = mount(FakeComponent);
         expect(caller).toHaveBeenCalledTimes(1);

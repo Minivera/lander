@@ -2,7 +2,6 @@
   "extends": [
     "standard",
     "prettier",
-    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "plugin:jest/recommended"
@@ -52,12 +51,6 @@
     // note you must disable the base rule as it can report incorrect errors
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": ["error"],
-
-    // react plugin - options
-    "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error",
-    "react/prop-types": "off",
-    "react/display-name": "off"
   },
   "settings": {
     "import/parsers": {

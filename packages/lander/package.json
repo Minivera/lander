@@ -14,21 +14,19 @@
   "homepage": "https://github.com/minivera/lander/tree/master/packages/lander#readme",
   "license": "ISC",
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build",
+    "build:dev": "ts-node ../../scripts/build.ts packages/lander",
+    "build:prod": "ts-node ../../scripts/build.ts packages/lander --production",
+    "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
+    "build": "rm -rf dist && npm run build:dev && npm run build:dts",
     "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
     "prepublishOnly": "npm run build",
-    "test": "tsdx test --env=jsdom",
-    "test:coverage": "tsdx test --env=jsdom --coverage",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "clean": "git clean -fdX ."
   },
   "main": "dist/index.js",
-  "module": "dist/lander.esm.js",
-  "browser": "dist/lander.esm.js",
-  "source": "src/index.ts",
-  "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "files": [
-    "src",
     "dist"
   ],
   "repository": {

@@ -1,11 +1,16 @@
-import { Props, FunctionComponent, TreeNode, VirtualNode, ComponentElement } from '@lander/lander';
+import {
+    TreeNode,
+    VirtualNode,
+    ComponentElement,
+    JSXFunctionComponent, JSXProps,
+} from '@lander/lander';
 
 import { Queries, findComponent, findAllComponents } from './queries';
 
 const elementContainers = new Set<HTMLElement>();
 
 interface Options {
-    props?: Props;
+    props?: JSXProps;
     children?: VirtualNode[];
     containerElement?: HTMLElement;
 }
@@ -20,7 +25,7 @@ interface Wrapper extends Queries {
 /**
  * Mounts the given component to a fake JSDOM element. It returns a wrapper element that contains helpful methods
  * as well as the HTMLElement for querying like you would in the normal DOM.
- * @param {FunctionComponent} component - The component to mount and render.
+ * @param {JSXFunctionComponent} component - The component to mount and render.
  * @param {Options} options - The options for the mounting process.
  * @param {Props} options.props - The properties to pass to the component, if any.
  * @param {VirtualNode[]} options.children - The children to pass to the component, if any.
@@ -29,7 +34,7 @@ interface Wrapper extends Queries {
  * purposes.
  */
 export const mount = (
-    component: FunctionComponent,
+    component: JSXFunctionComponent,
     { props = {}, children = [], containerElement }: Options = {}
 ): Wrapper => {
     if (typeof component !== 'function') {

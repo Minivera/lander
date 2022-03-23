@@ -19,6 +19,13 @@
     "target": "ESNext",
     "types": ["node", "jest"]
   },
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    // same as our --compilerOptions flag and our TS_NODE_COMPILER_OPTIONS environment variable
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "include": ["packages/**/*", "demo/**/*", "**/*.spec.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -12,13 +12,8 @@
   "homepage": "https://github.com/minivera/lander/tree/master/packages/blueprint#readme",
   "license": "ISC",
   "main": "dist/index.js",
-  "module": "dist/blueprint.esm.js",
-  "browser": "dist/blueprint.esm.js",
-  "source": "src/index.ts",
-  "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "files": [
-    "src",
     "dist"
   ],
   "repository": {
@@ -26,11 +21,14 @@
     "url": "git+https://github.com/Minivera/lander.git"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build --target=node",
+    "build:dev": "ts-node ../../scripts/build.ts packages/blueprint",
+    "build:prod": "ts-node ../../scripts/build.ts packages/blueprint --production",
+    "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
+    "build": "rm -rf dist && npm run build:dev && npm run build:dts",
     "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
     "prepublishOnly": "npm run build",
-    "test": "tsdx test --env=jest-environment-jsdom-sixteen",
-    "test:coverage": "tsdx test --env=jest-environment-jsdom-sixteen --coverage",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "clean": "git clean -fdX ."
   },
   "bugs": {

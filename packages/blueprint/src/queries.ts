@@ -12,7 +12,7 @@ export const findComponent = (element: HTMLElement) => (factory: FunctionCompone
         const component = components.item(i) as ComponentElement;
         const augmentedFactory = component.getFactory();
 
-        if (augmentedFactory && augmentedFactory.original === factory) {
+        if (augmentedFactory && augmentedFactory === factory) {
             return component;
         }
     }
@@ -28,7 +28,7 @@ export const findAllComponents = (element: HTMLElement) => (factory: FunctionCom
         const component = components.item(i) as ComponentElement;
         const augmentedFactory = component.getFactory();
 
-        if (augmentedFactory && augmentedFactory.original === factory) {
+        if (augmentedFactory && augmentedFactory === factory) {
             found.push(component);
         }
     }

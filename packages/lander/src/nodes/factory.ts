@@ -63,7 +63,7 @@ export const createNode = (
         return new TreeNode({
             factory: tag as JSXFunctionComponent,
             attributes: props,
-            children: flatChildren.map(vnodizeChildren).filter(child => child),
+            children: flatChildren.map(vnodizeChildren).filter(child => child) as VirtualNode[],
         });
     }
     if (Object.prototype.hasOwnProperty.call(tag, 'text')) {
@@ -73,6 +73,6 @@ export const createNode = (
     return new HtmlNode({
         tag: tag as string,
         attributes: props,
-        children: flatChildren.map(vnodizeChildren).filter(child => child),
+        children: flatChildren.map(vnodizeChildren).filter(child => child) as VirtualNode[],
     });
 };

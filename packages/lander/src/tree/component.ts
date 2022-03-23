@@ -243,4 +243,11 @@ export class ComponentElement extends window.HTMLElement {
 
         return vnodizeChildren(result) || null;
     }
+
+    /**
+     * Returns the factory saved inside this component.
+     */
+    public getFactory(): JSXFunctionComponent | null {
+        return this.factory;
+    }
 }
