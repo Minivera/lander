@@ -18,13 +18,14 @@
     "build:prod": "ts-node ../../scripts/build.ts packages/lander --production",
     "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
     "build": "rm -rf dist && npm run build:dev && npm run build:dts",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
     "prepublishOnly": "npm run build",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "clean": "git clean -fdX ."
   },
-  "main": "dist/index.js",
+  "main": "dist/index.esm.mjs",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
