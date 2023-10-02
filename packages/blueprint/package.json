@@ -25,6 +25,7 @@
     "build:prod": "ts-node ../../scripts/build.ts packages/blueprint --production",
     "build:dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts",
     "build": "rm -rf dist && npm run build:dev && npm run build:dts",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}'",
     "prepublishOnly": "npm run build",
     "test": "jest",

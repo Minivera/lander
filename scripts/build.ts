@@ -121,9 +121,9 @@ class Builder {
         }
     }
 
-    processArgv() {
+    async processArgv() {
         this.config.packagePath = process.argv[2];
-        const options = yargs(process.argv.slice(3)).options({
+        const options = await yargs(process.argv.slice(3)).options({
             verbose: { type: 'boolean', default: false },
             v: { type: 'boolean', default: false },
             prod: { type: 'boolean', default: false },
@@ -139,7 +139,7 @@ class Builder {
     }
 
     async run() {
-        this.processArgv();
+        await this.processArgv();
 
         if (this.config.verbose) {
             this.writeln(`* Using esbuild v${esbuild.version}.`);
